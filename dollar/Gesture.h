@@ -28,6 +28,9 @@ namespace dollar {
 			const std::string& getName() {
 				return m_name;
 			}
+			const uint32_t& getId() {
+				return m_subId;
+			}
 			const std::vector<std::vector<vec2>>& getPath() const {
 				return m_path;
 			}

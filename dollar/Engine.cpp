@@ -146,13 +146,18 @@ static float calculateBestDistance(const std::vector<vec2>& _points, const std::
 }
 
 
-static float calculatePPlusDistance(const std::vector<vec2>& _points, const std::vector<vec2>& _reference, std::vector<std::pair<int32_t, int32_t>& _dataDebug) {
+static float calculatePPlusDistance(const std::vector<vec2>& _points,
+                                    const std::vector<vec2>& _reference,
+                                    std::vector<std::pair<int32_t, int32_t>>& _dataDebug) {
 	std::vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
 	distance.resize(_points.size(), MAX_FLOAT);
 	// point Id that is link on the reference.
 	std::vector<int32_t> usedId;
 	usedId.resize(_reference.size(), -1);
-	
+	#ifdef PLOPPPPPPPPPP
+	std::vector<int32_t> usedId2;
+	usedId2.resize(_points.size(), -1);
+	#endif
 	for (int32_t iii=0; iii<_points.size(); iii++) {
 		if (distance[iii] < 100.0) {
 			continue;
@@ -161,6 +166,7 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points, const std:
 		int32_t kkkBest = -1;
 		for (int32_t kkk=0; kkk<_reference.size(); ++kkk) {
 			float dist = (_points[iii]-_reference[kkk]).length2();
+			#ifndef PLOPPPPPPPPPP
 			if (usedId[kkk] != -1) {
 				if (dist < distance[usedId[kkk]]) {
 					if (dist < bestDistance) {
@@ -168,7 +174,9 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points, const std:
 						kkkBest = kkk;
 					}
 				}
-			} else {
+			} else
+			#endif
+			{
 				if (dist < bestDistance) {
 					bestDistance = dist;
 					kkkBest = kkk;
@@ -176,13 +184,21 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points, const std:
 			}
 		}
 		if (kkkBest != -1) {
+			#ifndef PLOPPPPPPPPPP
 			int32_t previous = usedId[kkkBest];
+			#endif
 			usedId[kkkBest] = iii;
 			distance[iii] = bestDistance;
+			//DOLLAR_INFO("set new link: " << iii << " with " << kkkBest << "     d=" << bestDistance);
+			#ifndef PLOPPPPPPPPPP
 			if (previous != -1) {
+				//DOLLAR_INFO("     Reject : " << previous);
 				distance[previous] = MAX_FLOAT;
 				iii = previous-1;
 			}
+			#else
+			usedId2[iii] = kkkBest;
+			#endif
 		}
 	}
 	double fullDistance = 0;
@@ -191,25 +207,35 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points, const std:
 	// now we count the full distance use and the number of local gesture not use
 	for (auto &it : distance) {
 		if (it < 100.0) {
-			fullDistance = it;
+			fullDistance += it;
 		} else {
-			// TODO : Only for debug
 			nbTestNotUsed++;
 		}
 	}
-	// TODO : Only for debug
 	// we count the number of point in the gesture reference not used:
 	for (auto &it : usedId) {
 		if (it == -1) {
 			nbReferenceNotUsed++;
 		}
 	}
+	// now we add panality:
+	fullDistance += float(nbTestNotUsed)* 0.1f;
+	fullDistance += float(nbReferenceNotUsed)* 0.1f;
+	
 	// TODO : Only for debug
-	for (int32_t kkk=0; kkk<_reference.size(); ++kkk) {
-		if (it != -1) {
-			_dataDebug.push_back(std::make_pair(it, kkk));
+	#ifndef PLOPPPPPPPPPP
+		for (int32_t kkk=0; kkk<usedId.size(); ++kkk) {
+			if (usedId[kkk] != -1) {
+				_dataDebug.push_back(std::make_pair(usedId[kkk], kkk));
+			}
 		}
-	}
+	#else
+		for (int32_t kkk=0; kkk<usedId2.size(); ++kkk) {
+			if (usedId2[kkk] != -1) {
+				_dataDebug.push_back(std::make_pair(kkk, usedId2[kkk]));
+			}
+		}
+	#endif
 	// TODO : Only for debug
 	DOLLAR_INFO("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
 	return fullDistance;
@@ -446,6 +472,64 @@ dollar::Results dollar::Engine::recognizeP(const std::vector<std::vector<vec2>>&
 	return res;
 }
 
+
+static void storeSVG(const std::string& _fileName,
+                               const dollar::Gesture& gesture,
+                               const std::vector<std::vector<vec2>>& _strokes,
+                               const std::vector<vec2>& _points,
+                               std::vector<std::pair<int32_t, int32_t>> _links) {
+	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+	data += "<svg height=\"100\" width=\"100\">\n";
+	for (auto &itLines : gesture.getPath()) {
+		data += "	<polyline fill=\"none\" stroke=\"black\" stroke-opacity=\"0.8\" stroke-width=\"2\"\n";
+		data += "	          points=\"";
+		bool first = true;
+		for (auto& itPoints : itLines) {
+			if (first == false) {
+				data += " ";
+			}
+			first = false;
+			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string(itPoints.y()*100.0f);
+		}
+		data += "\"\n";
+		data += "	          />\n";
+	}
+	for (auto &itLines : dollar::scaleToOne(_strokes)) {
+		data += "	<polyline fill=\"none\" stroke=\"purple\" stroke-opacity=\"0.8\" stroke-width=\"2\"\n";
+		data += "	          points=\"";
+		bool first = true;
+		for (auto& itPoints : itLines) {
+			if (first == false) {
+				data += " ";
+			}
+			first = false;
+			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string(itPoints.y()*100.0f);
+		}
+		data += "\"\n";
+		data += "	          />\n";
+	}
+	std::vector<vec2> refListPoint = gesture.getEnginePoints();
+	for (auto &it : refListPoint) {
+		data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string(it.y()*100.0f) + "\" r=\"0.6\"/>\n";
+	}
+	std::vector<vec2> testListPoint = _points;
+	for (auto &it : testListPoint) {
+		data += "	<circle fill=\"orange\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string(it.y()*100.0f) + "\" r=\"0.6\"/>\n";
+	}
+	for (auto &it : _links) {
+		data += "	<polyline fill=\"none\" stroke=\"blue\" stroke-opacity=\"0.8\" stroke-width=\"0.5\"\n";
+		data += "	          points=\"";
+		data += etk::to_string(refListPoint[it.second].x()*100.0f) + "," + etk::to_string(refListPoint[it.second].y()*100.0f);
+		data += " ";
+		data += etk::to_string(testListPoint[it.first].x()*100.0f) + "," + etk::to_string(testListPoint[it.first].y()*100.0f);
+		data += "\"\n";
+		data += "	          />\n";
+	}
+	data += "</svg>\n";
+	etk::FSNodeWriteAllData(_fileName, data);
+}
+
+
 dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec2>>& _strokes) {
 	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance);
 	// Keep maximum 5 results ...
@@ -469,8 +553,9 @@ dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec
 		}
 		float distance = MAX_FLOAT;
 		DOLLAR_INFO("[" << iii << "]  " << m_gestures[iii].getName());
-		std::vector<std::pair<int32_t, int32_t> dataPair;
+		std::vector<std::pair<int32_t, int32_t>> dataPair;
 		distance = calculatePPlusDistance(points, gesture.getEnginePoints(), dataPair);
+		storeSVG("out/KKK_" + gesture.getName() + "_" + etk::to_string(gesture.getId()) + ".svg", gesture, _strokes, points, dataPair);
 		for (size_t kkk=0; kkk<MAX_RESULT_NUMBER; ++kkk) {
 			if (distance < bestDistance[kkk]) {
 				if (kkk == 0) {

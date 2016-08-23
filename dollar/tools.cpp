@@ -234,5 +234,6 @@ std::vector<vec2> dollar::normalizePathToPoints(std::vector<std::vector<vec2>> _
 			out.push_back(it[it.size()-1]);
 		}
 	}
-	return translateBariCenterToZero(out);
+	return out;
+	// NOTE: this is a bad idea ... return translateBariCenterToZero(out);
 }
