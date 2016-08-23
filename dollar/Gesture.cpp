@@ -124,16 +124,12 @@ void dollar::Gesture::storeJSON(const std::string& _fileName) {
 	doc.store(_fileName);
 }
 
-void dollar::Gesture::storeSVG(const std::string& _fileName) {
+void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
 	std::vector<std::vector<vec2>> strokes = dollar::scaleToOne(m_path);
 	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itLines : strokes) {
-		data += "	<polyline\n";
-		data += "	          fill=\"none\"\n";
-		data += "	          stroke=\"black\"\n";
-		data += "	          stroke-opacity=\"1\"\n";
-		data += "	          stroke-width=\"2\"\n";
+		data += "	<polyline fill=\"none\" stroke=\"black\" stroke-opacity=\"1\" stroke-width=\"2\"\n";
 		data += "	          points=\"";
 		bool first = true;
 		for (auto& itPoints : itLines) {
@@ -146,15 +142,35 @@ void dollar::Gesture::storeSVG(const std::string& _fileName) {
 		data += "\"\n";
 		data += "	          />\n";
 	}
+	if (_storeDot == true) {
+		for (auto &it : dollar::scaleToOne(m_enginePoints)) {
+			data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string(it.y()*100.0f) + "\" r=\"0.6\"/>\n";
+		}
+	}
 	data += "</svg>\n";
 	etk::FSNodeWriteAllData(_fileName, data);
 }
 
-
-void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation) {
+void dollar::Gesture::set(const std::string& _name, uint32_t _subId, std::vector<std::vector<vec2>> _path) {
+	m_name = _name;
+	m_subId = _subId;
+	m_path = _path;
 	m_enginePath.clear();
 	m_engineVector.clear();
 	m_engineStartV.clear();
+	m_enginePoints.clear();
+}
+
+void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation, float _distance) {
+	m_enginePath.clear();
+	m_engineVector.clear();
+	m_engineStartV.clear();
+	m_enginePoints.clear();
+	// Generates dots:
+	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance);
+	DOLLAR_INFO("create " << m_enginePoints.size() << " points");
+	// for debug only
+	storeSVG("out/zzz_" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
 	// Simplyfy paths
 	std::vector<std::vector<vec2>> uniPath = dollar::makeReferenceStrokes(m_path);
 	// normalize paths

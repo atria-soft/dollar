@@ -20,13 +20,19 @@ int main(int _argc, const char *_argv[]) {
 	return RUN_ALL_TESTS();
 }
 
+TEST(TestAll, plop) {
+	dollar::Gesture gest;
+	gest.set("test", 55, dollar::loadPoints("DATA:test/P.json"));
+	gest.configure(0.1, 64, false, 0.1f);
+}
+
 /*
  * single-stroke gesture recognition
  */
 TEST(TestAll, singleStroke_normal) {
 	dollar::Engine reco;
 	reco.loadPath("DATA:figure");
-	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/Arrow.json"), "normal");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/Arrow.json"), "$N");
 	EXPECT_EQ(res.haveMath(), true);
 	if (res.haveMath() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -42,7 +48,7 @@ TEST(TestAll, singleStroke_normal) {
 TEST(TestAll, singleStroke_protractor) {
 	dollar::Engine reco;
 	reco.loadPath("DATA:figure");
-	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/Arrow.json"), "protractor");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/Arrow.json"), "$N-protractor");
 	EXPECT_EQ(res.haveMath(), true);
 	if (res.haveMath() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -62,7 +68,7 @@ TEST(TestAll, singleStroke_protractor) {
 TEST(TestAll, multiStroke_normal) {
 	dollar::Engine reco;
 	reco.loadPath("DATA:text");
-	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/P.json"), "normal");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/P.json"), "$N");
 	EXPECT_EQ(res.haveMath(), true);
 	if (res.haveMath() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -78,7 +84,43 @@ TEST(TestAll, multiStroke_normal) {
 TEST(TestAll, multiStroke_protractor) {
 	dollar::Engine reco;
 	reco.loadPath("DATA:text");
-	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/P.json"), "protractor");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/P.json"), "$N-protractor");
+	EXPECT_EQ(res.haveMath(), true);
+	if (res.haveMath() == false) {
+		TEST_INFO("   Recognise noting ...");
+		return;
+	}
+	EXPECT_EQ(res.getName(), "P");
+	TEST_INFO("Results");
+	for (size_t iii=0; iii<res.getSize(); ++iii) {
+		TEST_INFO("    - " << res.getName(iii) << " score=" << res.getConfidence(iii));
+	}
+}
+/*
+ * $P algorithms
+ */
+TEST(TestAll, multiStroke_point) {
+	dollar::Engine reco;
+	reco.loadPath("DATA:text");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/P.json"), "$P");
+	EXPECT_EQ(res.haveMath(), true);
+	if (res.haveMath() == false) {
+		TEST_INFO("   Recognise noting ...");
+		return;
+	}
+	EXPECT_EQ(res.getName(), "P");
+	TEST_INFO("Results");
+	for (size_t iii=0; iii<res.getSize(); ++iii) {
+		TEST_INFO("    - " << res.getName(iii) << " score=" << res.getConfidence(iii));
+	}
+}
+/*
+ * $P+ algorithms
+ */
+TEST(TestAll, multiStroke_pointPlus) {
+	dollar::Engine reco;
+	reco.loadPath("DATA:text");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/P.json"), "$P+");
 	EXPECT_EQ(res.haveMath(), true);
 	if (res.haveMath() == false) {
 		TEST_INFO("   Recognise noting ...");

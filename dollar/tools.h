@@ -101,6 +101,15 @@ namespace dollar {
 	 * @return new list of points
 	 */
 	std::vector<vec2> normalizePath(std::vector<vec2> _points, size_t _nbSample, bool _ignoreRotation);
+	
+	/**
+	 * @brief Transform the path to be comparable, resample the path with a specific number of sample, and limit size at 1.0 square center around 0
+	 * @note The difference with @ref normalizePath is thet we do not combinethe path together, that permit to not have unneded point between strokes...
+	 * @param[in] _points List of points in the path
+	 * @param[in] _distance Distance between points
+	 * @return new list of points
+	 */
+	std::vector<vec2> normalizePathToPoints(std::vector<std::vector<vec2>> _points, float _distance);
 }
 
 

@@ -103,21 +103,18 @@ std::vector<vec2> dollar::translateBariCenterToZero(std::vector<vec2> _points) {
 	return out;
 }
 
-
-std::vector<vec2> dollar::resample(std::vector<vec2> _points, int32_t _nbPoints) {
+static std::vector<vec2> discretize(std::vector<vec2> _points, float _interval) {
 	std::vector<vec2> out;
-	// calculate the interval between every points ...
-	float interval = pathLength(_points) / (_nbPoints - 1);
-	float distance = 0.0;
 	// same first point ==> no change
 	out.push_back(_points.front());
+	float distance = 0.0f;
 	// For all other point we have to resample elements
 	for (size_t iii=1; iii<_points.size(); ++iii) {
 		vec2 currentPoint = _points[iii];
 		vec2 previousPoint = _points[iii-1];
 		float tmpDist = (currentPoint-previousPoint).length();
-		if ((distance + tmpDist) >= interval) {
-			vec2 point = previousPoint + (currentPoint - previousPoint) * ((interval - distance) / tmpDist);
+		if ((distance + tmpDist) >= _interval) {
+			vec2 point = previousPoint + (currentPoint - previousPoint) * ((_interval - distance) / tmpDist);
 			out.push_back(point);
 			_points.insert(_points.begin() + iii, point);
 			distance = 0.0;
@@ -125,6 +122,14 @@ std::vector<vec2> dollar::resample(std::vector<vec2> _points, int32_t _nbPoints)
 			distance += tmpDist;
 		}
 	}
+	return out;
+}
+
+std::vector<vec2> dollar::resample(std::vector<vec2> _points, int32_t _nbPoints) {
+	std::vector<vec2> out;
+	// calculate the interval between every points ...
+	float interval = pathLength(_points) / (_nbPoints - 1);
+	out = discretize(_points, interval);
 	// somtimes we fall a rounding-error short of adding the last point, so add it if so
 	if (int64_t(out.size()) == (_nbPoints - 1)) {
 		out.push_back(_points.back());
@@ -205,5 +210,29 @@ std::vector<vec2> dollar::normalizePath(std::vector<vec2> _points, size_t _nbSam
 		_points = rotateToZero(_points);
 	}
 	_points = scaleToOne(_points);
-	return translateBariCenterToZero(_points);;
+	return translateBariCenterToZero(_points);
+}
+
+
+std::vector<vec2> dollar::normalizePathToPoints(std::vector<std::vector<vec2>> _points, float _distance) {
+	// Scale point to (0.0,0.0) position and (1.0,1.0) size
+	_points = dollar::scaleToOne(_points);
+	std::vector<vec2> out;
+	for (auto &it : _points) {
+		if (it.size() == 0) {
+			continue;
+		}
+		if (it.size() == 1) {
+			out.push_back(it[0]);
+			continue;
+		}
+		std::vector<vec2> tmp = discretize(it, _distance);
+		for (auto &pointIt : tmp) {
+			out.push_back(pointIt);
+		}
+		if (tmp[tmp.size()-1] != it[it.size()-1]) {
+			out.push_back(it[it.size()-1]);
+		}
+	}
+	return translateBariCenterToZero(out);
 }

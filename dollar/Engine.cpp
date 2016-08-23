@@ -53,7 +53,8 @@ static float pathDistance(const std::vector<vec2>& _path1, const std::vector<vec
 	return (distance / _path1.size());
 }
 
-dollar::Engine::Engine() {
+dollar::Engine::Engine():
+  m_PPlusDistance(0.10f) {
 	m_numPointsInGesture = 128;
 	DOLLAR_ASSERT(m_numPointsInGesture>16, "NB element in a path must be > 16 ...");
 	setRotationInvariance(false);
@@ -67,7 +68,7 @@ void dollar::Engine::setNumberPointInGesture(size_t _value) {
 	m_numPointsInGesture = _value;
 	DOLLAR_ASSERT(m_numPointsInGesture>16, "NB element in a path must be > 16 ...");
 	for (auto &it: m_gestures) {
-		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation);
+		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance);
 	}
 }
 
@@ -100,6 +101,121 @@ float dollar::Engine::distanceAtBestAngle(const std::vector<vec2>& _points, cons
 	}
 	return std::min(f1, f2);
 }
+
+static float cloudDistance(const std::vector<vec2>& _points1, const std::vector<vec2>& _points2, size_t _start) {
+	std::vector<bool> matched;
+	matched.resize(_points1.size(), false);
+	float out = 0;
+	size_t iii = _start;
+	do {
+		float min = MAX_FLOAT;
+		size_t index = 0;
+		for (size_t jjj=0; jjj<matched.size(); ++jjj) {
+			if (matched[jjj] == true) {
+				continue;
+			}
+			float distance = (_points1[iii] - _points2[jjj]).length();
+			if (distance < min) {
+				min = distance;
+				index = jjj;
+			}
+		}
+		matched[index] = true;
+		float weight = 1.0 - ((iii - _start + _points1.size()) % _points1.size())/_points1.size();
+		out = out + weight* min;
+		iii = (iii + 1) % _points1.size();
+	} while(iii != _start);
+	return out;
+}
+
+//Greedy-Cloud-Match
+static float calculateBestDistance(const std::vector<vec2>& _points, const std::vector<vec2>& _reference) {
+	float out = MAX_FLOAT;
+	float si = 0.5f;
+	float step = pow(_points.size(), si-1);
+	if (step < 1) {
+		// DOLLAR_ERROR(" step is too small ... " << step);
+		step = 1.0f;
+	}
+	for (size_t iii=0; iii<_points.size(); iii+=int32_t(step)) {
+		float d1 = cloudDistance(_points, _reference, iii);
+		float d2 = cloudDistance(_reference, _points, iii);
+		out = std::min(out, std::min(d1,d2));
+	}
+	return out;	// Distance to the nearest point must be < 2.0 (maximum distance visible)
+}
+
+
+static float calculatePPlusDistance(const std::vector<vec2>& _points, const std::vector<vec2>& _reference, std::vector<std::pair<int32_t, int32_t>& _dataDebug) {
+	std::vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
+	distance.resize(_points.size(), MAX_FLOAT);
+	// point Id that is link on the reference.
+	std::vector<int32_t> usedId;
+	usedId.resize(_reference.size(), -1);
+	
+	for (int32_t iii=0; iii<_points.size(); iii++) {
+		if (distance[iii] < 100.0) {
+			continue;
+		}
+		float bestDistance = MAX_FLOAT;
+		int32_t kkkBest = -1;
+		for (int32_t kkk=0; kkk<_reference.size(); ++kkk) {
+			float dist = (_points[iii]-_reference[kkk]).length2();
+			if (usedId[kkk] != -1) {
+				if (dist < distance[usedId[kkk]]) {
+					if (dist < bestDistance) {
+						bestDistance = dist;
+						kkkBest = kkk;
+					}
+				}
+			} else {
+				if (dist < bestDistance) {
+					bestDistance = dist;
+					kkkBest = kkk;
+				}
+			}
+		}
+		if (kkkBest != -1) {
+			int32_t previous = usedId[kkkBest];
+			usedId[kkkBest] = iii;
+			distance[iii] = bestDistance;
+			if (previous != -1) {
+				distance[previous] = MAX_FLOAT;
+				iii = previous-1;
+			}
+		}
+	}
+	double fullDistance = 0;
+	int32_t nbTestNotUsed = 0;
+	int32_t nbReferenceNotUsed = 0;
+	// now we count the full distance use and the number of local gesture not use
+	for (auto &it : distance) {
+		if (it < 100.0) {
+			fullDistance = it;
+		} else {
+			// TODO : Only for debug
+			nbTestNotUsed++;
+		}
+	}
+	// TODO : Only for debug
+	// we count the number of point in the gesture reference not used:
+	for (auto &it : usedId) {
+		if (it == -1) {
+			nbReferenceNotUsed++;
+		}
+	}
+	// TODO : Only for debug
+	for (int32_t kkk=0; kkk<_reference.size(); ++kkk) {
+		if (it != -1) {
+			_dataDebug.push_back(std::make_pair(it, kkk));
+		}
+	}
+	// TODO : Only for debug
+	DOLLAR_INFO("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
+	return fullDistance;
+}
+
+
 
 float dollar::Engine::optimalCosineDistance(const std::vector<vec2>& _vect1, const std::vector<vec2>& _vect2) {
 	if (_vect1.size() != _vect2.size()) {
@@ -152,7 +268,7 @@ bool dollar::Engine::loadGesture(const std::string& _filename) {
 }
 
 void dollar::Engine::addGesture(Gesture _gesture) {
-	_gesture.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation);
+	_gesture.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance);
 	m_gestures.push_back(std::move(_gesture));
 }
 
@@ -164,13 +280,27 @@ dollar::Results dollar::Engine::recognize(const std::vector<vec2>& _points, cons
 #define MAX_RESULT_NUMBER (5)
 
 dollar::Results dollar::Engine::recognize(const std::vector<std::vector<vec2>>& _strokes, const std::string& _method) {
-	std::vector<vec2> points = dollar::combineStrokes(_strokes);
-	// Make sure we have some templates to compare this to
-	//  or else recognition will be impossible
+	// Check if we have gestures...
 	if (m_gestures.empty()) {
 		DOLLAR_WARNING("No templates loaded so no symbols to match.");
 		return Results();
 	}
+	if (    _method == "$N-protractor"
+	     || _method == "$N"
+	     || _method == "$1") {
+		return recognizeN(_strokes, _method);
+	} else if (_method == "$P") {
+		return recognizeP(_strokes);
+	} else if (_method == "$P+") {
+		return recognizePPlus(_strokes);
+	}
+	DOLLAR_WARNING("Un-recognise methode ... '" << _method << "' supported: [$1,$N,$N-protractor,$P,$P+]" );
+	return Results();
+}
+
+
+dollar::Results dollar::Engine::recognizeN(const std::vector<std::vector<vec2>>& _strokes, const std::string& _method) {
+	std::vector<vec2> points = dollar::combineStrokes(_strokes);
 	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation);
 	vec2 startv = dollar::getStartVector(points, m_numPointsInGesture/RATIO_START_VECTOR);
 	std::vector<vec2> vector = normalyse(points);
@@ -196,11 +326,11 @@ dollar::Results dollar::Engine::recognize(const std::vector<std::vector<vec2>>& 
 			}
 			float distance = MAX_FLOAT;
 			// for Protractor
-			if (_method=="protractor") {
-				distance = Engine::optimalCosineDistance(vector, gesture.getEngineVector(jjj));
+			if (_method=="$p-protractor") {
+				distance = optimalCosineDistance(vector, gesture.getEngineVector(jjj));
 			} else {
 				// Golden Section Search (original $N)
-				distance = Engine::distanceAtBestAngle(points, gesture.getEnginePath(jjj));
+				distance = distanceAtBestAngle(points, gesture.getEnginePath(jjj));
 			}
 			for (size_t kkk=0; kkk<MAX_RESULT_NUMBER; ++kkk) {
 				if (distance < bestDistance[kkk]) {
@@ -224,16 +354,14 @@ dollar::Results dollar::Engine::recognize(const std::vector<std::vector<vec2>>& 
 			}
 		}
 	}
-	// Make sure we actually found a good match
-	// Sometimes we don't, like when the user doesn't draw enough points
+	// Check if we have match ...
 	if (-1 == indexOfBestMatch[0]) {
 		DOLLAR_WARNING("Couldn't find a good match.");
 		return Results();
 	}
 	Results res;
-	// Turn the distance into a percentage by dividing it by half the maximum possible distance (across the diagonal of the square we scaled everything too)
-	// Distance = hwo different they are subtract that from 1 (100%) to get the similarity
-	if (_method == "protractor") {
+	// transform distance in a % range
+	if (_method == "$p-protractor") {
 		for (size_t iii=0; iii<MAX_RESULT_NUMBER; ++iii) {
 			if (-1 != indexOfBestMatch[0]) {
 				float score = MAX_FLOAT;;
@@ -254,3 +382,129 @@ dollar::Results dollar::Engine::recognize(const std::vector<std::vector<vec2>>& 
 	return res;
 }
 
+
+dollar::Results dollar::Engine::recognizeP(const std::vector<std::vector<vec2>>& _strokes) {
+	std::vector<vec2> points = dollar::combineStrokes(_strokes);
+	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation);
+	// Keep maximum 5 results ...
+	float bestDistance[MAX_RESULT_NUMBER];
+	int32_t indexOfBestMatch[MAX_RESULT_NUMBER];
+	for (size_t iii=0; iii<MAX_RESULT_NUMBER; ++iii) {
+		bestDistance[iii] = MAX_FLOAT;
+		indexOfBestMatch[iii] = -1;
+	}
+	// for each multistroke
+	for (size_t iii=0; iii<m_gestures.size(); ++iii) {
+		DOLLAR_DEBUG("[" << iii << "] '" << m_gestures[iii].getName() << "'");
+		Gesture gesture = m_gestures[iii];
+		if (gesture.getEngineSize() == 0) {
+			// Only need the first gesture ...
+			continue;
+		}
+		size_t jjj = 0;
+		if (gesture.getEnginePath(jjj).size() == 0) {
+			DOLLAR_ERROR("Reference path with no Value");
+			continue;
+		}
+		float distance = MAX_FLOAT;
+		distance = calculateBestDistance(points, gesture.getEnginePath(jjj));
+		for (size_t kkk=0; kkk<MAX_RESULT_NUMBER; ++kkk) {
+			if (distance < bestDistance[kkk]) {
+				if (kkk == 0) {
+					DOLLAR_DEBUG("[" << iii << "," << jjj << "]                     d=" << distance << " < bd=" << bestDistance << " ");
+				}
+				if (indexOfBestMatch[kkk] != int64_t(iii)) {
+					for (int32_t rrr=MAX_RESULT_NUMBER-1; rrr>int32_t(kkk); --rrr) {
+						bestDistance[rrr] = bestDistance[rrr-1];
+						indexOfBestMatch[rrr] = indexOfBestMatch[rrr-1];
+					}
+					indexOfBestMatch[kkk] = iii;
+				}
+				bestDistance[kkk] = distance;
+				break;
+			} else {
+				if (kkk == 0) {
+					DOLLAR_VERBOSE("[" << iii << "," << jjj << "]                     d=" << distance << " < bd=" << bestDistance << " ");
+				}
+			}
+		}
+	}
+	// Check if we have match ...
+	if (-1 == indexOfBestMatch[0]) {
+		DOLLAR_WARNING("Couldn't find a good match.");
+		return Results();
+	}
+	Results res;
+	for (size_t iii=0; iii<MAX_RESULT_NUMBER; ++iii) {
+		if (-1 != indexOfBestMatch[iii]) {
+			//float score = std::max((2.0 - bestDistance[iii])/2.0, 0.0);
+			float score = bestDistance[iii];
+			res.addValue(m_gestures[indexOfBestMatch[iii]].getName(), score);
+		}
+	}
+
+	return res;
+}
+
+dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec2>>& _strokes) {
+	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance);
+	// Keep maximum 5 results ...
+	float bestDistance[MAX_RESULT_NUMBER];
+	int32_t indexOfBestMatch[MAX_RESULT_NUMBER];
+	for (size_t iii=0; iii<MAX_RESULT_NUMBER; ++iii) {
+		bestDistance[iii] = MAX_FLOAT;
+		indexOfBestMatch[iii] = -1;
+	}
+	// for each multistroke
+	for (size_t iii=0; iii<m_gestures.size(); ++iii) {
+		DOLLAR_DEBUG("[" << iii << "] '" << m_gestures[iii].getName() << "'");
+		Gesture gesture = m_gestures[iii];
+		if (gesture.getEngineSize() == 0) {
+			// Only need the first gesture ...
+			continue;
+		}
+		if (gesture.getEnginePoints().size() == 0) {
+			DOLLAR_ERROR("Reference path with no Value");
+			continue;
+		}
+		float distance = MAX_FLOAT;
+		DOLLAR_INFO("[" << iii << "]  " << m_gestures[iii].getName());
+		std::vector<std::pair<int32_t, int32_t> dataPair;
+		distance = calculatePPlusDistance(points, gesture.getEnginePoints(), dataPair);
+		for (size_t kkk=0; kkk<MAX_RESULT_NUMBER; ++kkk) {
+			if (distance < bestDistance[kkk]) {
+				if (kkk == 0) {
+					DOLLAR_DEBUG("[" << iii << "]                     d=" << distance << " < bd=" << bestDistance << " ");
+				}
+				if (indexOfBestMatch[kkk] != int64_t(iii)) {
+					for (int32_t rrr=MAX_RESULT_NUMBER-1; rrr>int32_t(kkk); --rrr) {
+						bestDistance[rrr] = bestDistance[rrr-1];
+						indexOfBestMatch[rrr] = indexOfBestMatch[rrr-1];
+					}
+					indexOfBestMatch[kkk] = iii;
+				}
+				bestDistance[kkk] = distance;
+				break;
+			} else {
+				if (kkk == 0) {
+					DOLLAR_VERBOSE("[" << iii << "]                     d=" << distance << " < bd=" << bestDistance << " ");
+				}
+			}
+		}
+	}
+	// Check if we have match ...
+	if (-1 == indexOfBestMatch[0]) {
+		DOLLAR_WARNING("Couldn't find a good match.");
+		return Results();
+	}
+	Results res;
+	for (size_t iii=0; iii<MAX_RESULT_NUMBER; ++iii) {
+		if (-1 != indexOfBestMatch[iii]) {
+			//float score = std::max((2.0 - bestDistance[iii])/2.0, 0.0);
+			float score = bestDistance[iii];
+			res.addValue(m_gestures[indexOfBestMatch[iii]].getName(), score);
+		}
+	}
+
+	return res;
+}

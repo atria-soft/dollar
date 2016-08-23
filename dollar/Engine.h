@@ -16,6 +16,7 @@
 namespace dollar {
 	class Engine {
 		protected:
+			float m_PPlusDistance;
 			float m_angleRange;
 			bool m_paramterIgnoreRotation; //!< Ignore the start rotation of the gesture
 		public:
@@ -30,12 +31,16 @@ namespace dollar {
 		public:
 			Engine();
 			float distanceAtBestAngle(const std::vector<vec2>& _points, const std::vector<vec2>& _reference);
-			Results recognize(const std::vector<std::vector<vec2>>& _paths, const std::string& _method="normal");
-			Results recognize(const std::vector<vec2>& _points, const std::string& _method="normal");
+			Results recognize(const std::vector<std::vector<vec2>>& _paths, const std::string& _method="$N");
+			Results recognize(const std::vector<vec2>& _points, const std::string& _method="$N");
 			float optimalCosineDistance(const std::vector<vec2>& _vect1, const std::vector<vec2>& _vect2);
 			bool loadPath(const std::string& _path);
 			bool loadGesture(const std::string& _filename);
 			void addGesture(Gesture _gesture);
+		private:
+			Results recognizeN(const std::vector<std::vector<vec2>>& _paths, const std::string& _method="$N");
+			Results recognizeP(const std::vector<std::vector<vec2>>& _paths);
+			Results recognizePPlus(const std::vector<std::vector<vec2>>& _paths);
 	};
 }
 

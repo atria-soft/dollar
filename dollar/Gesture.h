@@ -18,11 +18,12 @@ namespace dollar {
 			Gesture();
 			bool load(const std::string& _filename);
 			bool store(const std::string& _filename);
+			void set(const std::string& _name, uint32_t _subId, std::vector<std::vector<vec2>> _path);
 		protected:
 			bool loadJSON(const std::string& _filename);
 			bool loadSVG(const std::string& _filename);
 			void storeJSON(const std::string& _filename);
-			void storeSVG(const std::string& _filename);
+			void storeSVG(const std::string& _filename, bool _storeDot=false);
 		public:
 			const std::string& getName() {
 				return m_name;
@@ -37,9 +38,10 @@ namespace dollar {
 			std::vector<std::vector<vec2>> m_enginePath; // Singulized path with every conbinaison
 			std::vector<std::vector<vec2>> m_engineVector;
 			std::vector<vec2> m_engineStartV;
+			std::vector<vec2> m_enginePoints;
 		public:
 			// Configure the reference gesture for recognition...
-			void configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation);
+			void configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation, float _distance);
 			size_t getEngineSize() const {
 				return m_enginePath.size();
 			}
@@ -51,6 +53,9 @@ namespace dollar {
 			}
 			const vec2& getEngineStartVector(size_t _id) const {
 				return m_engineStartV[_id];
+			}
+			const std::vector<vec2>& getEnginePoints() const {
+				return m_enginePoints;
 			}
 	};
 	std::vector<std::vector<vec2>> loadPoints(const std::string& _fileName);
