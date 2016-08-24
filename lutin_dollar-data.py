@@ -25,6 +25,5 @@ def create(target, module_name):
 	my_module = module.Module(__file__, module_name, get_type())
 	my_module.copy_path('data/text/*.json', 'text')
 	my_module.copy_path('data/figure/*.json', 'figure')
-	my_module.copy_path('data/test/*.json', 'test')
 	return my_module
 

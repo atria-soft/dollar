@@ -35,10 +35,30 @@ static std::vector<std::vector<vec2>> loadPointsJson(const ejson::Document& _doc
 	return out;
 }
 
-std::vector<std::vector<vec2>> dollar::loadPoints(const std::string& _fileName) {
+std::vector<std::vector<vec2>> dollar::loadPoints(const std::string& _fileName, std::string* _label, std::string* _type) {
 	ejson::Document doc;
 	doc.load(_fileName);
-	return loadPointsJson(doc);
+	if (_label != nullptr) {
+		*_label = doc["value"].toString().get();
+	}
+	if (_type != nullptr) {
+		*_type = doc["type"].toString().get();
+	}
+	// extract lines:
+	std::vector<std::vector<vec2>> out;
+	ejson::Array listOfLines = doc["data"].toArray();
+	for (auto itLines : listOfLines) {
+		ejson::Array listOfpoint = itLines.toObject()["list"].toArray();
+		std::vector<vec2> line;
+		for (auto itPoints : listOfpoint) {
+			ejson::Array pointsArray = itPoints.toArray();
+			line.push_back(vec2(pointsArray[0].toNumber().get(), pointsArray[1].toNumber().get()));
+		}
+		if (line.size() > 1) {
+			out.push_back(std::move(line));
+		}
+	}
+	return out;
 }
 
 
@@ -84,6 +104,12 @@ bool dollar::Gesture::loadSVG(const std::string& _fileName) {
 	m_name = plop[0];
 	m_subId = etk::string_to_int32_t(plop[1]);
 	m_path = doc.getLines();
+	// SVG is written in the oposite mode ==> need to invert it ...
+	for (auto &it : m_path) {
+		for (auto &it2 : it) {
+			it2.setY(it2.y()*-1);
+		}
+	}
 	m_path = dollar::scaleToOne(m_path);
 	DOLLAR_DEBUG("Load gesture : " << m_name << " id=" << m_subId << " nb_elem=" << m_path.size());
 	return true;
@@ -137,14 +163,14 @@ void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string(itPoints.y()*100.0f);
+			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
 	}
 	if (_storeDot == true) {
-		for (auto &it : dollar::scaleToOne(m_enginePoints)) {
-			data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string(it.y()*100.0f) + "\" r=\"0.6\"/>\n";
+		for (auto &it : m_enginePoints) {
+			data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 		}
 	}
 	data += "</svg>\n";
@@ -168,7 +194,7 @@ void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _
 	m_enginePoints.clear();
 	// Generates dots:
 	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance);
-	DOLLAR_INFO("create " << m_enginePoints.size() << " points");
+	DOLLAR_VERBOSE("create " << m_enginePoints.size() << " points");
 	// for debug only
 	storeSVG("out/zzz_" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
 	// Simplyfy paths

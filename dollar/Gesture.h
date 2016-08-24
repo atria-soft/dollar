@@ -61,5 +61,5 @@ namespace dollar {
 				return m_enginePoints;
 			}
 	};
-	std::vector<std::vector<vec2>> loadPoints(const std::string& _fileName);
+	std::vector<std::vector<vec2>> loadPoints(const std::string& _fileName, std::string* _label=nullptr, std::string* _type=nullptr);
 }

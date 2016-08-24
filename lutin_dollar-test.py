@@ -35,5 +35,6 @@ def create(target, module_name):
 	    'test-debug',
 	    'gtest',
 	    ])
+	my_module.copy_path('data/test/*.json', 'test')
 	return my_module
 

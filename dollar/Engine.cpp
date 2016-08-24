@@ -154,10 +154,6 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 	// point Id that is link on the reference.
 	std::vector<int32_t> usedId;
 	usedId.resize(_reference.size(), -1);
-	#ifdef PLOPPPPPPPPPP
-	std::vector<int32_t> usedId2;
-	usedId2.resize(_points.size(), -1);
-	#endif
 	for (int32_t iii=0; iii<_points.size(); iii++) {
 		if (distance[iii] < 100.0) {
 			continue;
@@ -166,7 +162,6 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 		int32_t kkkBest = -1;
 		for (int32_t kkk=0; kkk<_reference.size(); ++kkk) {
 			float dist = (_points[iii]-_reference[kkk]).length2();
-			#ifndef PLOPPPPPPPPPP
 			if (usedId[kkk] != -1) {
 				if (dist < distance[usedId[kkk]]) {
 					if (dist < bestDistance) {
@@ -174,9 +169,7 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 						kkkBest = kkk;
 					}
 				}
-			} else
-			#endif
-			{
+			} else {
 				if (dist < bestDistance) {
 					bestDistance = dist;
 					kkkBest = kkk;
@@ -184,21 +177,15 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 			}
 		}
 		if (kkkBest != -1) {
-			#ifndef PLOPPPPPPPPPP
 			int32_t previous = usedId[kkkBest];
-			#endif
 			usedId[kkkBest] = iii;
 			distance[iii] = bestDistance;
 			//DOLLAR_INFO("set new link: " << iii << " with " << kkkBest << "     d=" << bestDistance);
-			#ifndef PLOPPPPPPPPPP
 			if (previous != -1) {
 				//DOLLAR_INFO("     Reject : " << previous);
 				distance[previous] = MAX_FLOAT;
 				iii = previous-1;
 			}
-			#else
-			usedId2[iii] = kkkBest;
-			#endif
 		}
 	}
 	double fullDistance = 0;
@@ -222,22 +209,12 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 	fullDistance += float(nbTestNotUsed)* 0.1f;
 	fullDistance += float(nbReferenceNotUsed)* 0.1f;
 	
-	// TODO : Only for debug
-	#ifndef PLOPPPPPPPPPP
-		for (int32_t kkk=0; kkk<usedId.size(); ++kkk) {
-			if (usedId[kkk] != -1) {
-				_dataDebug.push_back(std::make_pair(usedId[kkk], kkk));
-			}
+	for (int32_t kkk=0; kkk<usedId.size(); ++kkk) {
+		if (usedId[kkk] != -1) {
+			_dataDebug.push_back(std::make_pair(usedId[kkk], kkk));
 		}
-	#else
-		for (int32_t kkk=0; kkk<usedId2.size(); ++kkk) {
-			if (usedId2[kkk] != -1) {
-				_dataDebug.push_back(std::make_pair(kkk, usedId2[kkk]));
-			}
-		}
-	#endif
-	// TODO : Only for debug
-	DOLLAR_INFO("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
+	}
+	DOLLAR_DEBUG("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
 	return fullDistance;
 }
 
@@ -278,14 +255,16 @@ bool dollar::Engine::loadPath(const std::string& _path) {
 	etk::FSNode path(_path);
 	std::vector<std::string> files = path.folderGetSub(false, true, "*.json");
 	for (auto &it : files) {
-		loadGesture(it);
+		if (etk::end_with(it, ".json") == true) {
+			loadGesture(it);
+		}
 	}
 	return true;
 }
 
 bool dollar::Engine::loadGesture(const std::string& _filename) {
 	dollar::Gesture ref;
-	DOLLAR_INFO("Load Gesture: " << _filename);
+	DOLLAR_DEBUG("Load Gesture: " << _filename);
 	if (ref.load(_filename) == true) {
 		addGesture(std::move(ref));
 		return true;
@@ -489,7 +468,7 @@ static void storeSVG(const std::string& _fileName,
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string(itPoints.y()*100.0f);
+			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
@@ -503,25 +482,25 @@ static void storeSVG(const std::string& _fileName,
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string(itPoints.y()*100.0f);
+			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
 	}
 	std::vector<vec2> refListPoint = gesture.getEnginePoints();
 	for (auto &it : refListPoint) {
-		data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string(it.y()*100.0f) + "\" r=\"0.6\"/>\n";
+		data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 	}
 	std::vector<vec2> testListPoint = _points;
 	for (auto &it : testListPoint) {
-		data += "	<circle fill=\"orange\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string(it.y()*100.0f) + "\" r=\"0.6\"/>\n";
+		data += "	<circle fill=\"orange\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 	}
 	for (auto &it : _links) {
 		data += "	<polyline fill=\"none\" stroke=\"blue\" stroke-opacity=\"0.8\" stroke-width=\"0.5\"\n";
 		data += "	          points=\"";
-		data += etk::to_string(refListPoint[it.second].x()*100.0f) + "," + etk::to_string(refListPoint[it.second].y()*100.0f);
+		data += etk::to_string(refListPoint[it.second].x()*100.0f) + "," + etk::to_string((1.0-refListPoint[it.second].y())*100.0f);
 		data += " ";
-		data += etk::to_string(testListPoint[it.first].x()*100.0f) + "," + etk::to_string(testListPoint[it.first].y()*100.0f);
+		data += etk::to_string(testListPoint[it.first].x()*100.0f) + "," + etk::to_string((1.0-testListPoint[it.first].y())*100.0f);
 		data += "\"\n";
 		data += "	          />\n";
 	}
@@ -552,7 +531,6 @@ dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec
 			continue;
 		}
 		float distance = MAX_FLOAT;
-		DOLLAR_INFO("[" << iii << "]  " << m_gestures[iii].getName());
 		std::vector<std::pair<int32_t, int32_t>> dataPair;
 		distance = calculatePPlusDistance(points, gesture.getEnginePoints(), dataPair);
 		storeSVG("out/KKK_" + gesture.getName() + "_" + etk::to_string(gesture.getId()) + ".svg", gesture, _strokes, points, dataPair);

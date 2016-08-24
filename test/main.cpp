@@ -32,7 +32,7 @@ TEST(TestAll, plop) {
 TEST(TestAll, singleStroke_normal) {
 	dollar::Engine reco;
 	reco.loadPath("DATA:figure");
-	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/Arrow.json"), "$N");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/arrow.json"), "$N");
 	EXPECT_EQ(res.haveMath(), true);
 	if (res.haveMath() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -48,7 +48,7 @@ TEST(TestAll, singleStroke_normal) {
 TEST(TestAll, singleStroke_protractor) {
 	dollar::Engine reco;
 	reco.loadPath("DATA:figure");
-	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/Arrow.json"), "$N-protractor");
+	dollar::Results res = reco.recognize(dollar::loadPoints("DATA:test/arrow.json"), "$N-protractor");
 	EXPECT_EQ(res.haveMath(), true);
 	if (res.haveMath() == false) {
 		TEST_INFO("   Recognise noting ...");

@@ -32,17 +32,17 @@ int main(int _argc, const char *_argv[]) {
 			usage(_argv[0]);
 			return 0;
 		}
+		if(    arg[0] == '-'
+		    && arg[1] == '-') {
+			// subLibrary usage ...
+			continue;
+		}
 		if (src == "") {
 			src = arg;
 			continue;
 		}
 		if (dst == "") {
 			dst = arg;
-			continue;
-		}
-		if(    arg[0] == '-'
-		    && arg[1] == '-') {
-			// subLibrary usage ...
 			continue;
 		}
 		usage(_argv[0]);
@@ -60,7 +60,6 @@ int main(int _argc, const char *_argv[]) {
 	TEST_PRINT("-- Load gesture: " << src);
 	TEST_PRINT("---------------------------------------------------------------------------");
 	// Load gesture with his extention type:
-	std::string tmpName = etk::tolower(src);
 	if (ref.load(src) == false) {
 		TEST_ERROR("Error when loading the gesture");
 		return -1;
