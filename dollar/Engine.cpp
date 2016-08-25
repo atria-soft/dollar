@@ -177,6 +177,9 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 			}
 		}
 		if (kkkBest != -1) {
+			if (bestDistance > 0.2*0.2) {
+				// reject the distance ...
+			}
 			int32_t previous = usedId[kkkBest];
 			usedId[kkkBest] = iii;
 			distance[iii] = bestDistance;
@@ -533,7 +536,7 @@ dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec
 		float distance = MAX_FLOAT;
 		std::vector<std::pair<int32_t, int32_t>> dataPair;
 		distance = calculatePPlusDistance(points, gesture.getEnginePoints(), dataPair);
-		storeSVG("out/KKK_" + gesture.getName() + "_" + etk::to_string(gesture.getId()) + ".svg", gesture, _strokes, points, dataPair);
+		storeSVG("out_dollar/lib/recognizePPlus/" + gesture.getName() + "_" + etk::to_string(gesture.getId()) + ".svg", gesture, _strokes, points, dataPair);
 		for (size_t kkk=0; kkk<MAX_RESULT_NUMBER; ++kkk) {
 			if (distance < bestDistance[kkk]) {
 				if (kkk == 0) {

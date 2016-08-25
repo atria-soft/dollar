@@ -123,11 +123,11 @@ void annalyseResult(std::map<std::string, std::vector<std::pair<dollar::Results,
 				TEST_WARNING("            " << it.first << " " << it.second << "");
 			}
 		}
-		generateFile("generate/OK/" + label + "_" + type + ".svg", listFull);
+		generateFile("out_dollar/bench-corpus/OK/" + label + "_" + type + ".svg", listFull);
 		if (listWrong.size() != 0) {
-			generateFile("generate/ERROR/" + label + "_" + type + "_ERROR.svg", listWrong);
+			generateFile("out_dollar/bench-corpus/ERROR/" + label + "_" + type + "_ERROR.svg", listWrong);
 		} else {
-			etk::FSNodeRemove("generate/ERROR/" + label + "_" + type + "_ERROR.svg");
+			etk::FSNodeRemove("out_dollar/bench-corpus/ERROR/" + label + "_" + type + "_ERROR.svg");
 		}
 	}
 }

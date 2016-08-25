@@ -196,7 +196,7 @@ void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _
 	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance);
 	DOLLAR_VERBOSE("create " << m_enginePoints.size() << " points");
 	// for debug only
-	storeSVG("out/zzz_" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
+	storeSVG("out_dollar/lib/gestures/" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
 	// Simplyfy paths
 	std::vector<std::vector<vec2>> uniPath = dollar::makeReferenceStrokes(m_path);
 	// normalize paths
