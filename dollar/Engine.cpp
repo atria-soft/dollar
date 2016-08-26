@@ -54,7 +54,8 @@ static float pathDistance(const std::vector<vec2>& _path1, const std::vector<vec
 }
 
 dollar::Engine::Engine():
-  m_PPlusDistance(0.10f) {
+  m_PPlusDistance(0.10f),
+  m_scaleKeepRatio(false) {
 	m_numPointsInGesture = 128;
 	DOLLAR_ASSERT(m_numPointsInGesture>16, "NB element in a path must be > 16 ...");
 	setRotationInvariance(false);
@@ -68,12 +69,40 @@ void dollar::Engine::setNumberPointInGesture(size_t _value) {
 	m_numPointsInGesture = _value;
 	DOLLAR_ASSERT(m_numPointsInGesture>16, "NB element in a path must be > 16 ...");
 	for (auto &it: m_gestures) {
-		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance);
+		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance, m_scaleKeepRatio);
 	}
 }
 
 size_t dollar::Engine::getNumberPointInGesture() {
 	return m_numPointsInGesture;
+}
+
+void dollar::Engine::setPPlusDistance(float _value) {
+	if (_value == m_PPlusDistance) {
+		return;
+	}
+	m_PPlusDistance = _value;
+	for (auto &it: m_gestures) {
+		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance, m_scaleKeepRatio);
+	}
+}
+
+float dollar::Engine::getPPlusDistance() {
+	return m_PPlusDistance;
+}
+
+void dollar::Engine::setScaleKeepRatio(bool _value) {
+	if (_value == m_scaleKeepRatio) {
+		return;
+	}
+	m_scaleKeepRatio = _value;
+	for (auto &it: m_gestures) {
+		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance, m_scaleKeepRatio);
+	}
+}
+
+bool dollar::Engine::getScaleKeepRatio() {
+	return m_scaleKeepRatio;
 }
 
 float dollar::Engine::distanceAtBestAngle(const std::vector<vec2>& _points, const std::vector<vec2>& _reference) {
@@ -177,17 +206,17 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 			}
 		}
 		if (kkkBest != -1) {
-			if (bestDistance > 0.2*0.2) {
-				// reject the distance ...
-			}
-			int32_t previous = usedId[kkkBest];
-			usedId[kkkBest] = iii;
-			distance[iii] = bestDistance;
-			//DOLLAR_INFO("set new link: " << iii << " with " << kkkBest << "     d=" << bestDistance);
-			if (previous != -1) {
-				//DOLLAR_INFO("     Reject : " << previous);
-				distance[previous] = MAX_FLOAT;
-				iii = previous-1;
+			// reject the distance ... if too big ...
+			if (bestDistance <= 0.2*0.2) {
+				int32_t previous = usedId[kkkBest];
+				usedId[kkkBest] = iii;
+				distance[iii] = bestDistance;
+				//DOLLAR_INFO("set new link: " << iii << " with " << kkkBest << "     d=" << bestDistance);
+				if (previous != -1) {
+					//DOLLAR_INFO("     Reject : " << previous);
+					distance[previous] = MAX_FLOAT;
+					iii = previous-1;
+				}
 			}
 		}
 	}
@@ -276,7 +305,7 @@ bool dollar::Engine::loadGesture(const std::string& _filename) {
 }
 
 void dollar::Engine::addGesture(Gesture _gesture) {
-	_gesture.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance);
+	_gesture.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance, m_scaleKeepRatio);
 	m_gestures.push_back(std::move(_gesture));
 }
 
@@ -309,7 +338,7 @@ dollar::Results dollar::Engine::recognize(const std::vector<std::vector<vec2>>& 
 
 dollar::Results dollar::Engine::recognizeN(const std::vector<std::vector<vec2>>& _strokes, const std::string& _method) {
 	std::vector<vec2> points = dollar::combineStrokes(_strokes);
-	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation);
+	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation, m_scaleKeepRatio);
 	vec2 startv = dollar::getStartVector(points, m_numPointsInGesture/RATIO_START_VECTOR);
 	std::vector<vec2> vector = normalyse(points);
 	// Keep maximum 5 results ...
@@ -393,7 +422,7 @@ dollar::Results dollar::Engine::recognizeN(const std::vector<std::vector<vec2>>&
 
 dollar::Results dollar::Engine::recognizeP(const std::vector<std::vector<vec2>>& _strokes) {
 	std::vector<vec2> points = dollar::combineStrokes(_strokes);
-	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation);
+	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation, m_scaleKeepRatio);
 	// Keep maximum 5 results ...
 	float bestDistance[MAX_RESULT_NUMBER];
 	int32_t indexOfBestMatch[MAX_RESULT_NUMBER];
@@ -456,10 +485,11 @@ dollar::Results dollar::Engine::recognizeP(const std::vector<std::vector<vec2>>&
 
 
 static void storeSVG(const std::string& _fileName,
-                               const dollar::Gesture& gesture,
-                               const std::vector<std::vector<vec2>>& _strokes,
-                               const std::vector<vec2>& _points,
-                               std::vector<std::pair<int32_t, int32_t>> _links) {
+                     const dollar::Gesture& gesture,
+                     const std::vector<std::vector<vec2>>& _strokes,
+                     const std::vector<vec2>& _points,
+                     std::vector<std::pair<int32_t, int32_t>> _links,
+                     bool _keepAspectRatio) {
 	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itLines : gesture.getPath()) {
@@ -476,7 +506,7 @@ static void storeSVG(const std::string& _fileName,
 		data += "\"\n";
 		data += "	          />\n";
 	}
-	for (auto &itLines : dollar::scaleToOne(_strokes)) {
+	for (auto &itLines : dollar::scaleToOne(_strokes, _keepAspectRatio)) {
 		data += "	<polyline fill=\"none\" stroke=\"purple\" stroke-opacity=\"0.8\" stroke-width=\"2\"\n";
 		data += "	          points=\"";
 		bool first = true;
@@ -513,7 +543,7 @@ static void storeSVG(const std::string& _fileName,
 
 
 dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec2>>& _strokes) {
-	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance);
+	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, m_scaleKeepRatio);
 	// Keep maximum 5 results ...
 	float bestDistance[MAX_RESULT_NUMBER];
 	int32_t indexOfBestMatch[MAX_RESULT_NUMBER];
@@ -536,7 +566,7 @@ dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec
 		float distance = MAX_FLOAT;
 		std::vector<std::pair<int32_t, int32_t>> dataPair;
 		distance = calculatePPlusDistance(points, gesture.getEnginePoints(), dataPair);
-		storeSVG("out_dollar/lib/recognizePPlus/" + gesture.getName() + "_" + etk::to_string(gesture.getId()) + ".svg", gesture, _strokes, points, dataPair);
+		//storeSVG("out_dollar/lib/recognizePPlus/" + gesture.getName() + "_" + etk::to_string(gesture.getId()) + ".svg", gesture, _strokes, points, dataPair, m_scaleKeepRatio);
 		for (size_t kkk=0; kkk<MAX_RESULT_NUMBER; ++kkk) {
 			if (distance < bestDistance[kkk]) {
 				if (kkk == 0) {

@@ -90,7 +90,6 @@ bool dollar::Gesture::loadJSON(const std::string& _fileName) {
 	m_name = doc["value"].toString().get();
 	m_subId = doc["sub-id"].toNumber().getU64(),
 	m_path = loadPointsJson(doc);
-	m_path = dollar::scaleToOne(m_path);
 	DOLLAR_DEBUG("Load gesture : " << m_name << " id=" << m_subId << " nb_elem=" << m_path.size());
 	return true;
 }
@@ -110,7 +109,6 @@ bool dollar::Gesture::loadSVG(const std::string& _fileName) {
 			it2.setY(it2.y()*-1);
 		}
 	}
-	m_path = dollar::scaleToOne(m_path);
 	DOLLAR_DEBUG("Load gesture : " << m_name << " id=" << m_subId << " nb_elem=" << m_path.size());
 	return true;
 }
@@ -151,7 +149,7 @@ void dollar::Gesture::storeJSON(const std::string& _fileName) {
 }
 
 void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
-	std::vector<std::vector<vec2>> strokes = dollar::scaleToOne(m_path);
+	std::vector<std::vector<vec2>> strokes = dollar::scaleToOne(m_path, true);
 	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itLines : strokes) {
@@ -185,23 +183,25 @@ void dollar::Gesture::set(const std::string& _name, uint32_t _subId, std::vector
 	m_engineVector.clear();
 	m_engineStartV.clear();
 	m_enginePoints.clear();
+	m_path2.clear();
 }
 
-void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation, float _distance) {
+void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation, float _distance, bool _keepAspectRatio) {
 	m_enginePath.clear();
 	m_engineVector.clear();
 	m_engineStartV.clear();
 	m_enginePoints.clear();
+	m_path2 = dollar::scaleToOne(m_path, _keepAspectRatio);
 	// Generates dots:
-	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance);
+	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance, _keepAspectRatio);
 	DOLLAR_VERBOSE("create " << m_enginePoints.size() << " points");
 	// for debug only
-	storeSVG("out_dollar/lib/gestures/" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
+	//storeSVG("out_dollar/lib/gestures/" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
 	// Simplyfy paths
 	std::vector<std::vector<vec2>> uniPath = dollar::makeReferenceStrokes(m_path);
 	// normalize paths
 	for (auto &it : uniPath) {
-		std::vector<vec2> val = dollar::normalizePath(it, _nbSample, _ignoreRotation);
+		std::vector<vec2> val = dollar::normalizePath(it, _nbSample, _ignoreRotation, _keepAspectRatio);
 		m_enginePath.push_back(val);
 		// calculate start vector:
 		vec2 startv = dollar::getStartVector(val, _startAngleIndex);

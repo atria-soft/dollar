@@ -119,6 +119,11 @@ bool testCorpus(const std::string& _srcCorpus) {
 	}
 //listOfElementInCorpus.clear();
 //listOfElementInCorpus.push_back("z");
+// Value to stop grouping in the same element ...
+float groupSize = 1.0;
+groupSize = 1.0;
+bool keepAspectRatio = false;
+
 	TEST_PRINT(" will done for: " << listOfElementInCorpus);
 	for (auto &itTypeOfCorpus : listOfElementInCorpus) {
 		TEST_PRINT("---------------------------------------------------------------------------");
@@ -141,19 +146,28 @@ bool testCorpus(const std::string& _srcCorpus) {
 			it.resize(fileFiltered.size(), OUT_OF_RANGE);
 		}
 		// Generate Full Files:
+		std::string itTypeOfCorpusFileName = itTypeOfCorpus;
+		if (itTypeOfCorpusFileName == "/") {
+			itTypeOfCorpusFileName = "slash";
+		} else if (itTypeOfCorpusFileName == "\\") {
+			itTypeOfCorpusFileName = "back-slash";
+		} else if (itTypeOfCorpusFileName == "?") {
+			itTypeOfCorpusFileName = "question";
+		}
 		{
 			std::vector<std::string> listPath;
 			for (size_t iii=0; iii<fileFiltered.size(); ++iii) {
 				listPath.push_back(fileFiltered[iii]);
 			}
-			generateFile("out_dollar/generate-form/pre_generate/" + itTypeOfCorpus + "_FULL.svg", listPath, "");
+			generateFile("out_dollar/generate-form/pre_generate/" + itTypeOfCorpusFileName + "_FULL.svg", listPath, "");
 		}
 		for (size_t iii=0; iii<fileFiltered.size(); ++iii) {
 			dollar::Gesture gest;
 			std::vector<std::vector<vec2>> listPoints = dollar::loadPoints(fileFiltered[iii]);
 			gest.set(itTypeOfCorpus, 0, listPoints);
-			gest.configure(10, 8, false, 0.1);
+			gest.configure(10, 8, false, 0.1, keepAspectRatio);
 			dollar::Engine reco;
+			reco.setScaleKeepRatio(keepAspectRatio);
 			reco.addGesture(gest);
 			std::vector<std::string> path = etk::split(fileFiltered[iii], '/');
 			std::string filename = path[path.size()-1];
@@ -177,9 +191,7 @@ bool testCorpus(const std::string& _srcCorpus) {
 		TEST_PRINT("---------------------------------------------------------------------------");
 		int32_t residualValues = fileFiltered.size();
 		int32_t subId = 1;
-		// Value to stop grouping in the same element ...
-		float groupSize = 1.0;
-		groupSize = 1.0;
+		
 		while (residualValues > 0) {
 			std::vector<int32_t> countMinimum;
 			countMinimum.resize(fileFiltered.size(), 0);
@@ -201,6 +213,10 @@ bool testCorpus(const std::string& _srcCorpus) {
 			}
 			if (bestId == -1) {
 				TEST_ERROR("No more elements ... residualValues=" << residualValues);
+				
+				// TODO : Add the rest of the elements ...
+				
+				
 				//==> Exit loop
 				residualValues = 0;
 				continue;
@@ -279,22 +295,28 @@ bool testCorpus(const std::string& _srcCorpus) {
 					results[jjj][linkIds[iii]] = OUT_OF_RANGE;
 				}
 			}
+			if (linkIds.size() <= 3) {
+				TEST_ERROR("Group is too small ... residualValues=" << residualValues);
+				// TODO : Add the rest of the elements ...
+				//==> Exit loop
+				residualValues = 0;
+				continue;
+			}
 			residualValues -= (linkIds.size() +1);
-			
 			TEST_DEBUG("Generate output files (SVG with all added path in one file)");
 			// Generate Files:
 			std::vector<std::string> listPath;
 			for (size_t iii=0; iii<linkIds.size(); ++iii) {
 				listPath.push_back(fileFiltered[linkIds[iii]]);
 			}
-			generateFile("out_dollar/generate-form/pre_generate/" + itTypeOfCorpus + "_" + etk::to_string(subId) + ".svg", listPath, fileFiltered[bestId]);
+			generateFile("out_dollar/generate-form/pre_generate/" + itTypeOfCorpusFileName + "_" + etk::to_string(subId) + ".svg", listPath, fileFiltered[bestId]);
 			TEST_DEBUG("Generate output file (corpus ...)");
 			// declare a Gesture (internal API)
 			dollar::Gesture ref;
 			ref.set(itTypeOfCorpus, subId, dollar::loadPoints(fileFiltered[bestId]));
 			// Store gesture with his extention type:
-			ref.store("out_dollar/generate-form/corpus/" + itTypeOfCorpus + "_" + etk::to_string(subId) + ".json");
-			ref.store("out_dollar/generate-form/corpus_svg/" + itTypeOfCorpus + "_" + etk::to_string(subId) + ".svg");
+			ref.store("out_dollar/generate-form/corpus/" + itTypeOfCorpusFileName + "_" + etk::to_string(subId) + ".json");
+			ref.store("out_dollar/generate-form/corpus_svg/" + itTypeOfCorpusFileName + "_" + etk::to_string(subId) + ".svg");
 			
 			
 			// Increment subId...

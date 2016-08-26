@@ -17,6 +17,15 @@ namespace dollar {
 	class Engine {
 		protected:
 			float m_PPlusDistance;
+		public:
+			void setPPlusDistance(float _value);
+			float getPPlusDistance();
+		protected:
+			bool m_scaleKeepRatio; // when rescale the path, keep the aspect ration for processing
+		public:
+			void setScaleKeepRatio(bool _value);
+			bool getScaleKeepRatio();
+		protected:
 			float m_angleRange;
 			bool m_paramterIgnoreRotation; //!< Ignore the start rotation of the gesture
 		public:

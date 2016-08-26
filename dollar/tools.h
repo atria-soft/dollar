@@ -47,7 +47,7 @@ namespace dollar {
 	 * @param[in] _keepAspectRation Keep the aspect ratio of the scaling
 	 * @return modify points
 	 */
-	std::vector<vec2> scaleToOne(const std::vector<vec2>& _points, bool _keepAspectRation=false);
+	std::vector<vec2> scaleToOne(const std::vector<vec2>& _points, bool _keepAspectRation=true);
 	/**
 	 * @brief Scale the list of point in a 1.0*1.0 box started at 0.0*0.0
 	 * @param[in] _points input path
@@ -98,18 +98,20 @@ namespace dollar {
 	 * @param[in] _points List of points in the path
 	 * @param[in] _nbSample Number of element to resample
 	 * @param[in] _ignoreRotation Ignore start rotation of the algorithm
+	 * @param[in] _keepAspectRatio Keep Aspect ratio when scaling to the correct size (1.0,1.0) (it will be centered)
 	 * @return new list of points
 	 */
-	std::vector<vec2> normalizePath(std::vector<vec2> _points, size_t _nbSample, bool _ignoreRotation);
+	std::vector<vec2> normalizePath(std::vector<vec2> _points, size_t _nbSample, bool _ignoreRotation, bool _keepAspectRatio);
 	
 	/**
 	 * @brief Transform the path to be comparable, resample the path with a specific number of sample, and limit size at 1.0 square center around 0
 	 * @note The difference with @ref normalizePath is thet we do not combinethe path together, that permit to not have unneded point between strokes...
 	 * @param[in] _points List of points in the path
 	 * @param[in] _distance Distance between points
+	 * @param[in] _keepAspectRatio Keep Aspect ratio when scaling to the correct size (1.0,1.0) (it will be centered)
 	 * @return new list of points
 	 */
-	std::vector<vec2> normalizePathToPoints(std::vector<std::vector<vec2>> _points, float _distance);
+	std::vector<vec2> normalizePathToPoints(std::vector<std::vector<vec2>> _points, float _distance, bool _keepAspectRatio);
 }
 
 

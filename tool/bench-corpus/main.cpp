@@ -135,6 +135,7 @@ void annalyseResult(std::map<std::string, std::vector<std::pair<dollar::Results,
 bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 	// declare a Gesture (internal API)
 	dollar::Engine reco;
+	reco.setScaleKeepRatio(false);
 	TEST_PRINT("---------------------------------------------------------------------------");
 	TEST_PRINT("-- Load Gestures: " << _srcGesture);
 	TEST_PRINT("---------------------------------------------------------------------------");
@@ -153,6 +154,7 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 	// "label_type" ==> list of (result, file test name)
 	std::map<std::string, std::vector<std::pair<dollar::Results, std::string>>> agregateResults;
 	int32_t nbRecognise = 0;
+	int32_t nbRecognise2 = 0;
 	int32_t nbtested = 0;
 	for (auto &it : files) {
 		std::string label;
@@ -180,15 +182,20 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 			}
 		#else
 			if (res.getName() == label) {
-				nbRecognise ++;
+				nbRecognise++;
+				nbRecognise2++;
 				TEST_INFO("         " << res.getName() << " score=" << res.getConfidence());
-			} else {
+			} else if (etk::toupper(res.getName()) == etk::toupper(label)) {
+				nbRecognise2++;
+				TEST_WARNING("         " << res.getName() << " score=" << res.getConfidence());
+			}else {
 				TEST_ERROR("         " << res.getName() << " score=" << res.getConfidence());
 			}
 		#endif
 	}
 	annalyseResult(agregateResults);
-	TEST_PRINT("Recognise: " << nbRecognise << " / " << nbtested << " ==> " << (float(nbRecognise) / float(nbtested) * 100.0f) << " %");
+	TEST_PRINT("Recognise:        " << nbRecognise << " / " << nbtested << " ==> " << (float(nbRecognise) / float(nbtested) * 100.0f) << " %");
+	TEST_PRINT("Recognise (a==A): " << nbRecognise2 << " / " << nbtested << " ==> " << (float(nbRecognise2) / float(nbtested) * 100.0f) << " %");
 	// All is done corectly
 	return 0;
 }
