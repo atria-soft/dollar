@@ -115,6 +115,9 @@ std::vector<vec2> dollar::translateBariCenterToZero(std::vector<vec2> _points) {
 
 static std::vector<vec2> discretize(std::vector<vec2> _points, float _interval) {
 	std::vector<vec2> out;
+	if (_points.size() == 0) {
+		return out;
+	}
 	// same first point ==> no change
 	out.push_back(_points.front());
 	float distance = 0.0f;
@@ -137,6 +140,9 @@ static std::vector<vec2> discretize(std::vector<vec2> _points, float _interval) 
 
 std::vector<vec2> dollar::resample(std::vector<vec2> _points, int32_t _nbPoints) {
 	std::vector<vec2> out;
+	if (_points.size() == 0) {
+		return out;
+	}
 	// calculate the interval between every points ...
 	float interval = pathLength(_points) / (_nbPoints - 1);
 	out = discretize(_points, interval);
@@ -191,6 +197,9 @@ std::vector<vec2> dollar::combineStrokes(const std::vector<std::vector<vec2>>& _
 
 vec2 dollar::getStartVector(const std::vector<vec2>& _points, float _index) {
 	DOLLAR_ASSERT(_index > 0, "index must be != of 0");
+	if (_points.size() <= _index) {
+		return vec2(1.0, 0.0);
+	}
 	vec2 vect = _points[_index] - _points[0];
 	float len = vect.length();
 	return vect / len;

@@ -21,6 +21,11 @@ namespace dollar {
 			void setPPlusDistance(float _value);
 			float getPPlusDistance();
 		protected:
+			float m_PPlusExcludeDistance;
+		public:
+			void setPPlusExcludeDistance(float _value);
+			float setPPlusExcludeDistance();
+		protected:
 			bool m_scaleKeepRatio; // when rescale the path, keep the aspect ration for processing
 		public:
 			void setScaleKeepRatio(bool _value);

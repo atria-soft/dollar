@@ -24,10 +24,20 @@ void usage(const std::string& _progName) {
 
 bool testCorpus(const std::string& _srcCorpus);
 
+static bool keepAspectRatio = false;
+static float distanceReference; // distance of the gesture reference [0.02, 0.3]
+static float distanceCheck; // distance of the test points           [0.02, 0.3]
+static float distanceExclude; // distance of the exclusion point     [0.1, 1.0]
+
+setScaleKeepRatio(keepAspectRatio);
+setPPlusDistance(distanceReference); // to generate reference gesture
+setPPlusDistance(distanceCheck); // to generate test gesture
+setPPlusExcludeDistance(distanceExclude);
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
 	std::string srcCorpus;
+	
 	for (int32_t iii=1; iii<_argc; ++iii) {
 		std::string arg = _argv[iii];
 		if (    arg == "-h"
@@ -35,8 +45,27 @@ int main(int _argc, const char *_argv[]) {
 			usage(_argv[0]);
 			return 0;
 		}
-		if(    arg[0] == '-'
-		    && arg[1] == '-') {
+		if (arg == "--keep_ratio") {
+			keepAspectRatio = true;
+			continue;
+		}
+		if (etk::start_with(arg,"--dist-ref=") == true) {
+			std::string val(&arg[11]);
+			distanceReference = etk::string_to_float(val);
+			continue;
+		}
+		if (etk::start_with(arg,"--dist-check=") == true) {
+			std::string val(&arg[13]);
+			distanceCheck = etk::string_to_float(val);
+			continue;
+		}
+		if (etk::start_with(arg,"--dist-excl=") == true) {
+			std::string val(&arg[12]);
+			distanceExclude = etk::string_to_float(val);
+			continue;
+		}
+		if (    arg[0] == '-'
+		     && arg[1] == '-') {
 			// subLibrary usage ...
 			continue;
 		}
@@ -118,13 +147,14 @@ bool testCorpus(const std::string& _srcCorpus) {
 		}
 	}
 //listOfElementInCorpus.clear();
-//listOfElementInCorpus.push_back("z");
+//listOfElementInCorpus.push_back("slash");
 // Value to stop grouping in the same element ...
 float groupSize = 1.0;
 groupSize = 1.0;
 bool keepAspectRatio = false;
 
 	TEST_PRINT(" will done for: " << listOfElementInCorpus);
+	int32_t nbElementGenerated = 0;
 	for (auto &itTypeOfCorpus : listOfElementInCorpus) {
 		TEST_PRINT("---------------------------------------------------------------------------");
 		TEST_PRINT("-- Generate FOR: '" << itTypeOfCorpus << "'");
@@ -134,7 +164,7 @@ bool keepAspectRatio = false;
 			if (etk::end_with(it, ".json") == true) {
 				std::vector<std::string> path = etk::split(it, '/');
 				std::string filename = path[path.size()-1];
-				if (etk::start_with(filename, itTypeOfCorpus) == true) {
+				if (etk::start_with(filename, itTypeOfCorpus + "_") == true) {
 					fileFiltered.push_back(it);
 				}
 			}
@@ -321,8 +351,12 @@ bool keepAspectRatio = false;
 			
 			// Increment subId...
 			subId++;
+			nbElementGenerated++;
 		}
 	}
+	TEST_PRINT("===========================================================================");
+	TEST_PRINT("== Gererate Done: " << nbElementGenerated);
+	TEST_PRINT("===========================================================================");
 	return 0;
 }
 

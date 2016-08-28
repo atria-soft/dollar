@@ -55,6 +55,7 @@ static float pathDistance(const std::vector<vec2>& _path1, const std::vector<vec
 
 dollar::Engine::Engine():
   m_PPlusDistance(0.10f),
+  m_PPlusExcludeDistance(0.2*0.2),
   m_scaleKeepRatio(false) {
 	m_numPointsInGesture = 128;
 	DOLLAR_ASSERT(m_numPointsInGesture>16, "NB element in a path must be > 16 ...");
@@ -78,19 +79,29 @@ size_t dollar::Engine::getNumberPointInGesture() {
 }
 
 void dollar::Engine::setPPlusDistance(float _value) {
-	if (_value == m_PPlusDistance) {
+	if (_value*_value == m_PPlusDistance*) {
 		return;
 	}
-	m_PPlusDistance = _value;
+	m_PPlusDistance = _value*_value;
 	for (auto &it: m_gestures) {
 		it.configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation, m_PPlusDistance, m_scaleKeepRatio);
 	}
 }
 
 float dollar::Engine::getPPlusDistance() {
-	return m_PPlusDistance;
+	return std::sqrt(m_PPlusDistance);
 }
 
+void dollar::Engine::setPPlusExcludeDistance(float _value) {
+	if (_value == m_PPlusExcludeDistance) {
+		return;
+	}
+	m_PPlusExcludeDistance = _value;
+}
+
+float dollar::Engine::getPPlusExcludeDistance() {
+	return m_PPlusExcludeDistance;
+}
 void dollar::Engine::setScaleKeepRatio(bool _value) {
 	if (_value == m_scaleKeepRatio) {
 		return;
@@ -207,7 +218,7 @@ static float calculatePPlusDistance(const std::vector<vec2>& _points,
 		}
 		if (kkkBest != -1) {
 			// reject the distance ... if too big ...
-			if (bestDistance <= 0.2*0.2) {
+			if (bestDistance <= m_PPlusExcludeDistance) {
 				int32_t previous = usedId[kkkBest];
 				usedId[kkkBest] = iii;
 				distance[iii] = bestDistance;
@@ -560,7 +571,7 @@ dollar::Results dollar::Engine::recognizePPlus(const std::vector<std::vector<vec
 			continue;
 		}
 		if (gesture.getEnginePoints().size() == 0) {
-			DOLLAR_ERROR("Reference path with no Value");
+			//DOLLAR_ERROR("Reference path with no Value");
 			continue;
 		}
 		float distance = MAX_FLOAT;
