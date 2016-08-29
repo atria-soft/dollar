@@ -7,6 +7,7 @@
 #pragma once
 #include <string>
 #include <etk/math/Vector2D.h>
+#include <ememory/memory.h>
 
 namespace dollar {
 	class Gesture {
@@ -14,9 +15,9 @@ namespace dollar {
 			std::string m_name;
 			uint32_t m_subId;
 			std::vector<std::vector<vec2>> m_path;
-			std::vector<std::vector<vec2>> m_path2;
 		public:
 			Gesture();
+			virtual ~Gesture() = default;
 			bool load(const std::string& _filename);
 			bool store(const std::string& _filename);
 			void set(const std::string& _name, uint32_t _subId, std::vector<std::vector<vec2>> _path);
@@ -31,35 +32,6 @@ namespace dollar {
 			}
 			const uint32_t& getId() {
 				return m_subId;
-			}
-			const std::vector<std::vector<vec2>>& getPath() const {
-				return m_path2;
-			}
-			std::vector<std::vector<vec2>>& getPath() {
-				return m_path2;
-			}
-		protected:
-			std::vector<std::vector<vec2>> m_enginePath; // Singulized path with every conbinaison
-			std::vector<std::vector<vec2>> m_engineVector;
-			std::vector<vec2> m_engineStartV;
-			std::vector<vec2> m_enginePoints;
-		public:
-			// Configure the reference gesture for recognition...
-			void configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation, float _distance, bool _keepAspectRatio);
-			size_t getEngineSize() const {
-				return m_enginePath.size();
-			}
-			const std::vector<vec2>& getEnginePath(size_t _id) const {
-				return m_enginePath[_id];
-			}
-			const std::vector<vec2>& getEngineVector(size_t _id) const {
-				return m_engineVector[_id];
-			}
-			const vec2& getEngineStartVector(size_t _id) const {
-				return m_engineStartV[_id];
-			}
-			const std::vector<vec2>& getEnginePoints() const {
-				return m_enginePoints;
 			}
 	};
 	std::vector<std::vector<vec2>> loadPoints(const std::string& _fileName, std::string* _label=nullptr, std::string* _type=nullptr);

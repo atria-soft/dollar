@@ -167,9 +167,11 @@ void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
 		data += "	          />\n";
 	}
 	if (_storeDot == true) {
+		/*
 		for (auto &it : m_enginePoints) {
 			data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 		}
+		*/
 	}
 	data += "</svg>\n";
 	etk::FSNodeWriteAllData(_fileName, data);
@@ -179,33 +181,4 @@ void dollar::Gesture::set(const std::string& _name, uint32_t _subId, std::vector
 	m_name = _name;
 	m_subId = _subId;
 	m_path = _path;
-	m_enginePath.clear();
-	m_engineVector.clear();
-	m_engineStartV.clear();
-	m_enginePoints.clear();
-	m_path2.clear();
-}
-
-void dollar::Gesture::configure(float _startAngleIndex, size_t _nbSample, bool _ignoreRotation, float _distance, bool _keepAspectRatio) {
-	m_enginePath.clear();
-	m_engineVector.clear();
-	m_engineStartV.clear();
-	m_enginePoints.clear();
-	m_path2 = dollar::scaleToOne(m_path, _keepAspectRatio);
-	// Generates dots:
-	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance, _keepAspectRatio);
-	DOLLAR_VERBOSE("create " << m_enginePoints.size() << " points");
-	// for debug only
-	//storeSVG("out_dollar/lib/gestures/" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
-	// Simplyfy paths
-	std::vector<std::vector<vec2>> uniPath = dollar::makeReferenceStrokes(m_path);
-	// normalize paths
-	for (auto &it : uniPath) {
-		std::vector<vec2> val = dollar::normalizePath(it, _nbSample, _ignoreRotation, _keepAspectRatio);
-		m_enginePath.push_back(val);
-		// calculate start vector:
-		vec2 startv = dollar::getStartVector(val, _startAngleIndex);
-		m_engineStartV.push_back(startv);
-		m_engineVector.push_back(dollar::normalyse(val));
-	}
 }

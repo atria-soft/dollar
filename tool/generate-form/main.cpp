@@ -16,23 +16,36 @@
 void usage(const std::string& _progName) {
 	TEST_PRINT("usage:");
 	TEST_PRINT("    " << _progName << " [option] corpus_path");
+	TEST_PRINT("        ");
 	TEST_PRINT("        [option]");
 	TEST_PRINT("            -h --help           Display this help");
+	TEST_PRINT("            --keep_ratio        Keep aspect ratio for the form recognition");
+	TEST_PRINT("            --dist-check=flaot  distance between points in the system recognition");
+	TEST_PRINT("            --dist-excl=flaot   distance to exclude points in the check algo");
+	TEST_PRINT("            --group-size=flaot  size of the distance between point to stop grouping in one form");
+	TEST_PRINT("            --mode=string       mode of reco");
+	TEST_PRINT("        ");
 	TEST_PRINT("        parameters (must be here)");
 	TEST_PRINT("            corpus_path         Path of the corpus files");
+	TEST_PRINT("        ");
+	TEST_PRINT("        example:");
+	
 }
 
 bool testCorpus(const std::string& _srcCorpus);
 
 static bool keepAspectRatio = false;
-static float distanceReference; // distance of the gesture reference [0.02, 0.3]
-static float distanceCheck; // distance of the test points           [0.02, 0.3]
-static float distanceExclude; // distance of the exclusion point     [0.1, 1.0]
+static float distanceReference = 0.1; // distance of the gesture reference [0.02, 0.3]
+static float distanceCheck = 0.1; // distance of the test points           [0.02, 0.3]
+static float distanceExclude = 0.2; // distance of the exclusion point     [0.1, 1.0]
+static float distanceGroupLimiting = 1.0; // square distance of the grouping genereation
+static std::string modeReco = "P+"; 
 
-setScaleKeepRatio(keepAspectRatio);
+setScaleKeepRatio();
 setPPlusDistance(distanceReference); // to generate reference gesture
 setPPlusDistance(distanceCheck); // to generate test gesture
-setPPlusExcludeDistance(distanceExclude);
+
+
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
@@ -52,16 +65,33 @@ int main(int _argc, const char *_argv[]) {
 		if (etk::start_with(arg,"--dist-ref=") == true) {
 			std::string val(&arg[11]);
 			distanceReference = etk::string_to_float(val);
+			TEST_PRINT("configure distanceReference=" << distanceReference);
 			continue;
 		}
+		// TODO: Must not be different ...
 		if (etk::start_with(arg,"--dist-check=") == true) {
 			std::string val(&arg[13]);
 			distanceCheck = etk::string_to_float(val);
+			distanceReference = distanceCheck;
+			TEST_PRINT("configure distanceCheck=" << distanceCheck);
 			continue;
 		}
 		if (etk::start_with(arg,"--dist-excl=") == true) {
 			std::string val(&arg[12]);
 			distanceExclude = etk::string_to_float(val);
+			TEST_PRINT("configure distanceExclude=" << distanceExclude);
+			continue;
+		}
+		if (etk::start_with(arg,"--group-size=") == true) {
+			std::string val(&arg[13]);
+			distanceGroupLimiting = etk::string_to_float(val);
+			TEST_PRINT("configure distanceGroupLimiting=" << distanceGroupLimiting);
+			continue;
+		}
+		if (etk::start_with(arg,"--mode=") == true) {
+			std::string val(&arg[7]);
+			modeReco = val;
+			TEST_PRINT("configure modeReco=" << modeReco);
 			continue;
 		}
 		if (    arg[0] == '-'
@@ -148,10 +178,7 @@ bool testCorpus(const std::string& _srcCorpus) {
 	}
 //listOfElementInCorpus.clear();
 //listOfElementInCorpus.push_back("slash");
-// Value to stop grouping in the same element ...
-float groupSize = 1.0;
-groupSize = 1.0;
-bool keepAspectRatio = false;
+
 
 	TEST_PRINT(" will done for: " << listOfElementInCorpus);
 	int32_t nbElementGenerated = 0;
@@ -195,9 +222,11 @@ bool keepAspectRatio = false;
 			dollar::Gesture gest;
 			std::vector<std::vector<vec2>> listPoints = dollar::loadPoints(fileFiltered[iii]);
 			gest.set(itTypeOfCorpus, 0, listPoints);
-			gest.configure(10, 8, false, 0.1, keepAspectRatio);
+			gest.configure(10, 8, false, distanceReference, keepAspectRatio);
 			dollar::Engine reco;
 			reco.setScaleKeepRatio(keepAspectRatio);
+			reco.setPPlusDistance(distanceCheck);
+			reco.setPPlusExcludeDistance(distanceExclude);
 			reco.addGesture(gest);
 			std::vector<std::string> path = etk::split(fileFiltered[iii], '/');
 			std::string filename = path[path.size()-1];
@@ -208,7 +237,7 @@ bool keepAspectRatio = false;
 					continue;
 				}
 				listPoints = dollar::loadPoints(fileFiltered[jjj]);
-				dollar::Results res = reco.recognize(listPoints, "$P+");
+				dollar::Results res = reco.recognize(listPoints, "$" + modeReco);
 				results[iii][jjj] = res.getConfidence();
 				results[jjj][iii] = res.getConfidence();
 				path = etk::split(fileFiltered[jjj], '/');
@@ -227,7 +256,7 @@ bool keepAspectRatio = false;
 			countMinimum.resize(fileFiltered.size(), 0);
 			for (size_t iii=0; iii<fileFiltered.size(); ++iii) {
 				for (size_t jjj=0; jjj<fileFiltered.size(); ++jjj) {
-					if (results[iii][jjj] < groupSize) {
+					if (results[iii][jjj] < distanceGroupLimiting) {
 						countMinimum[iii] ++;
 					}
 				}
@@ -256,7 +285,7 @@ bool keepAspectRatio = false;
 			// Order the result for the bestID ==> permit to show if it is possible to do a better case ...
 			std::vector<int32_t> linkIds;
 			for (size_t jjj=0; jjj<fileFiltered.size(); ++jjj) {
-				if (results[bestId][jjj] < groupSize) {
+				if (results[bestId][jjj] < distanceGroupLimiting) {
 					linkIds.push_back(jjj);
 				}
 			}
@@ -287,7 +316,7 @@ bool keepAspectRatio = false;
 					float lastValue = 0.0;
 					linkIds.clear();
 					for (size_t jjj=0; jjj<ordered.size(); ++jjj) {
-						if (ordered[jjj].first < groupSize) {
+						if (ordered[jjj].first < distanceGroupLimiting) {
 							linkIds.push_back(ordered[jjj].second);
 						} else {
 							// auto find a separation in the group ...

@@ -31,7 +31,13 @@ def create(target, module_name):
 	my_module.add_src_file([
 		'dollar/debug.cpp',
 		'dollar/Engine.cpp',
+		'dollar/EngineN.cpp',
+		'dollar/EngineP.cpp',
+		'dollar/EnginePPlus.cpp',
 		'dollar/Gesture.cpp',
+		'dollar/GestureN.cpp',
+		'dollar/GestureP.cpp',
+		'dollar/GesturePPlus.cpp',
 		'dollar/Results.cpp',
 		'dollar/tools.cpp',
 		'dollar/Rectangle.cpp'
@@ -51,6 +57,7 @@ def create(target, module_name):
 	    'etk',
 	    'ejson',
 	    'esvg',
+	    'ememory',
 	    ])
 	return my_module
 
