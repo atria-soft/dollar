@@ -5,7 +5,7 @@
  */
 
 #include <iostream>
-#include <dollar/Engine.h>
+#include <dollar/EnginePPlus.h>
 #include <dollar/tools.h>
 
 #include <etk/etk.h>
@@ -18,12 +18,13 @@ void usage(const std::string& _progName) {
 	TEST_PRINT("    " << _progName << " [option] corpus_path");
 	TEST_PRINT("        ");
 	TEST_PRINT("        [option]");
-	TEST_PRINT("            -h --help           Display this help");
-	TEST_PRINT("            --keep_ratio        Keep aspect ratio for the form recognition");
-	TEST_PRINT("            --dist-check=flaot  distance between points in the system recognition");
-	TEST_PRINT("            --dist-excl=flaot   distance to exclude points in the check algo");
-	TEST_PRINT("            --group-size=flaot  size of the distance between point to stop grouping in one form");
-	TEST_PRINT("            --mode=string       mode of reco");
+	TEST_PRINT("            -h --help             Display this help");
+	TEST_PRINT("            --keep_ratio          Keep aspect ratio for the form recognition");
+	TEST_PRINT("            --dist-check=flaot    distance between points in the system recognition");
+	TEST_PRINT("            --dist-excl=flaot     distance to exclude a point in a pathern matching ...");
+	TEST_PRINT("            --group-size=flaot    size of the distance between point to stop grouping in one form");
+	TEST_PRINT("            --penal-ref=float     Penality for reference when not connected");
+	TEST_PRINT("            --penal-sample=float  Penality for sample when not connected");
 	TEST_PRINT("        ");
 	TEST_PRINT("        parameters (must be here)");
 	TEST_PRINT("            corpus_path         Path of the corpus files");
@@ -35,16 +36,11 @@ void usage(const std::string& _progName) {
 bool testCorpus(const std::string& _srcCorpus);
 
 static bool keepAspectRatio = false;
-static float distanceReference = 0.1; // distance of the gesture reference [0.02, 0.3]
-static float distanceCheck = 0.1; // distance of the test points           [0.02, 0.3]
-static float distanceExclude = 0.2; // distance of the exclusion point     [0.1, 1.0]
-static float distanceGroupLimiting = 1.0; // square distance of the grouping genereation
-static std::string modeReco = "P+"; 
-
-setScaleKeepRatio();
-setPPlusDistance(distanceReference); // to generate reference gesture
-setPPlusDistance(distanceCheck); // to generate test gesture
-
+static float distanceReference = 0.1f; // distance of the gesture reference [0.02, 0.3]
+static float distanceExclude = 0.2f; // distance of the exclusion point     [0.1, 1.0]
+static float distanceGroupLimiting = 1.0f; // square distance of the grouping genereation
+static float penalityRef = 0.1;
+static float penalitySample = 0.1;
 
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
@@ -68,14 +64,6 @@ int main(int _argc, const char *_argv[]) {
 			TEST_PRINT("configure distanceReference=" << distanceReference);
 			continue;
 		}
-		// TODO: Must not be different ...
-		if (etk::start_with(arg,"--dist-check=") == true) {
-			std::string val(&arg[13]);
-			distanceCheck = etk::string_to_float(val);
-			distanceReference = distanceCheck;
-			TEST_PRINT("configure distanceCheck=" << distanceCheck);
-			continue;
-		}
 		if (etk::start_with(arg,"--dist-excl=") == true) {
 			std::string val(&arg[12]);
 			distanceExclude = etk::string_to_float(val);
@@ -88,10 +76,16 @@ int main(int _argc, const char *_argv[]) {
 			TEST_PRINT("configure distanceGroupLimiting=" << distanceGroupLimiting);
 			continue;
 		}
-		if (etk::start_with(arg,"--mode=") == true) {
-			std::string val(&arg[7]);
-			modeReco = val;
-			TEST_PRINT("configure modeReco=" << modeReco);
+		if (etk::start_with(arg,"--penal-ref=") == true) {
+			std::string val(&arg[12]);
+			penalityRef = etk::string_to_float(val);
+			TEST_PRINT("configure penalityRef=" << penalityRef);
+			continue;
+		}
+		if (etk::start_with(arg,"--penal-sample=") == true) {
+			std::string val(&arg[15]);
+			penalityRef = etk::string_to_float(val);
+			TEST_PRINT("configure penalitySample=" << penalitySample);
 			continue;
 		}
 		if (    arg[0] == '-'
@@ -176,6 +170,8 @@ bool testCorpus(const std::string& _srcCorpus) {
 			}
 		}
 	}
+	// remove generation path ...
+	etk::FSNodeRemove("out_dollar/generate-form");
 //listOfElementInCorpus.clear();
 //listOfElementInCorpus.push_back("slash");
 
@@ -219,14 +215,15 @@ bool testCorpus(const std::string& _srcCorpus) {
 			generateFile("out_dollar/generate-form/pre_generate/" + itTypeOfCorpusFileName + "_FULL.svg", listPath, "");
 		}
 		for (size_t iii=0; iii<fileFiltered.size(); ++iii) {
-			dollar::Gesture gest;
+			ememory::SharedPtr<dollar::GesturePPlus> gest = ememory::makeShared<dollar::GesturePPlus>();
 			std::vector<std::vector<vec2>> listPoints = dollar::loadPoints(fileFiltered[iii]);
-			gest.set(itTypeOfCorpus, 0, listPoints);
-			gest.configure(10, 8, false, distanceReference, keepAspectRatio);
-			dollar::Engine reco;
+			gest->set(itTypeOfCorpus, 0, listPoints);
+			dollar::EnginePPlus reco;
 			reco.setScaleKeepRatio(keepAspectRatio);
-			reco.setPPlusDistance(distanceCheck);
+			reco.setPPlusDistance(distanceReference);
 			reco.setPPlusExcludeDistance(distanceExclude);
+			reco.setPenalityNotLinkRef(penalityRef);
+			reco.setPenalityNotLinkSample(penalitySample);
 			reco.addGesture(gest);
 			std::vector<std::string> path = etk::split(fileFiltered[iii], '/');
 			std::string filename = path[path.size()-1];
@@ -237,7 +234,7 @@ bool testCorpus(const std::string& _srcCorpus) {
 					continue;
 				}
 				listPoints = dollar::loadPoints(fileFiltered[jjj]);
-				dollar::Results res = reco.recognize(listPoints, "$" + modeReco);
+				dollar::Results res = reco.recognize(listPoints);
 				results[iii][jjj] = res.getConfidence();
 				results[jjj][iii] = res.getConfidence();
 				path = etk::split(fileFiltered[jjj], '/');
@@ -312,6 +309,7 @@ bool testCorpus(const std::string& _srcCorpus) {
 					}
 				}
 				// enable/disable grouping auto ...
+				// TODO : Check if it is possible ...
 				if (false) {
 					float lastValue = 0.0;
 					linkIds.clear();

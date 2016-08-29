@@ -5,7 +5,7 @@
  */
 
 #include <iostream>
-#include <dollar/Engine.h>
+#include <dollar/EnginePPlus.h>
 #include <dollar/tools.h>
 
 #include <etk/etk.h>
@@ -17,13 +17,24 @@ void usage(const std::string& _progName) {
 	TEST_PRINT("usage:");
 	TEST_PRINT("    " << _progName << " [option] reference_gesture corpus_path");
 	TEST_PRINT("        [option]");
-	TEST_PRINT("            -h --help           Display this help");
+	TEST_PRINT("            -h --help             Display this help");
+	TEST_PRINT("            --keep_ratio          Keep aspect ratio for the form recognition");
+	TEST_PRINT("            --dist-check=flaot    distance between points in the system recognition");
+	TEST_PRINT("            --dist-excl=flaot     distance to exclude a point in a pathern matching ...");
+	TEST_PRINT("            --penal-ref=float     Penality for reference when not connected");
+	TEST_PRINT("            --penal-sample=float  Penality for sample when not connected");
 	TEST_PRINT("        parameters (must be here)");
 	TEST_PRINT("            reference_gesture   Path of the reference gestures");
 	TEST_PRINT("            corpus_path         Path of the corpus files");
 }
 
 bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus);
+
+static bool keepAspectRatio = false;
+static float distanceReference = 0.1f; // distance of the gesture reference [0.02, 0.3]
+static float distanceExclude = 0.2f; // distance of the exclusion point     [0.1, 1.0]
+static float penalityRef = 0.1;
+static float penalitySample = 0.1;
 
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
@@ -36,6 +47,34 @@ int main(int _argc, const char *_argv[]) {
 		     || arg == "--help") {
 			usage(_argv[0]);
 			return 0;
+		}
+		if (arg == "--keep_ratio") {
+			keepAspectRatio = true;
+			continue;
+		}
+		if (etk::start_with(arg,"--dist-ref=") == true) {
+			std::string val(&arg[11]);
+			distanceReference = etk::string_to_float(val);
+			TEST_PRINT("configure distanceReference=" << distanceReference);
+			continue;
+		}
+		if (etk::start_with(arg,"--dist-excl=") == true) {
+			std::string val(&arg[12]);
+			distanceExclude = etk::string_to_float(val);
+			TEST_PRINT("configure distanceExclude=" << distanceExclude);
+			continue;
+		}
+		if (etk::start_with(arg,"--penal-ref=") == true) {
+			std::string val(&arg[12]);
+			penalityRef = etk::string_to_float(val);
+			TEST_PRINT("configure penalityRef=" << penalityRef);
+			continue;
+		}
+		if (etk::start_with(arg,"--penal-sample=") == true) {
+			std::string val(&arg[15]);
+			penalityRef = etk::string_to_float(val);
+			TEST_PRINT("configure penalitySample=" << penalitySample);
+			continue;
 		}
 		if(    arg[0] == '-'
 		    && arg[1] == '-') {
@@ -134,8 +173,12 @@ void annalyseResult(std::map<std::string, std::vector<std::pair<dollar::Results,
 
 bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 	// declare a Gesture (internal API)
-	dollar::Engine reco;
-	reco.setScaleKeepRatio(false);
+	dollar::EnginePPlus reco;
+	reco.setScaleKeepRatio(keepAspectRatio);
+	reco.setPPlusDistance(distanceReference);
+	reco.setPPlusExcludeDistance(distanceExclude);
+	reco.setPenalityNotLinkRef(penalityRef);
+	reco.setPenalityNotLinkSample(penalitySample);
 	TEST_PRINT("---------------------------------------------------------------------------");
 	TEST_PRINT("-- Load Gestures: " << _srcGesture);
 	TEST_PRINT("---------------------------------------------------------------------------");
@@ -167,7 +210,7 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 		std::vector<std::string> path = etk::split(it, '/');
 		std::string filename = path[path.size()-1];
 		TEST_PRINT("Test '" << label << "' type=" << type << "       " << filename);
-		dollar::Results res = reco.recognize(listPoints, "$P+");
+		dollar::Results res = reco.recognize(listPoints);
 		
 		agregateResults[label+" "+type].push_back(std::make_pair(res,it));
 		

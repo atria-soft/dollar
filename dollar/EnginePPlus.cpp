@@ -18,16 +18,18 @@
 dollar::EnginePPlus::EnginePPlus():
   m_PPlusDistance(0.10f),
   m_PPlusExcludeDistance(0.2*0.2),
-  m_scaleKeepRatio(false) {
+  m_scaleKeepRatio(false),
+  m_penalityNotLinkRef(0.1),
+  m_penalityNotLinkSample(0.1) {
 	
 }
 
 
 void dollar::EnginePPlus::setPPlusDistance(float _value) {
-	if (_value*_value == m_PPlusDistance) {
+	if (_value == m_PPlusDistance) {
 		return;
 	}
-	m_PPlusDistance = _value*_value;
+	m_PPlusDistance = _value;
 	for (auto &it: m_gestures) {
 		if (it == nullptr) {
 			continue;
@@ -37,18 +39,18 @@ void dollar::EnginePPlus::setPPlusDistance(float _value) {
 }
 
 float dollar::EnginePPlus::getPPlusDistance() {
-	return std::sqrt(m_PPlusDistance);
+	return m_PPlusDistance;
 }
 
 void dollar::EnginePPlus::setPPlusExcludeDistance(float _value) {
-	if (_value == m_PPlusExcludeDistance) {
+	if (_value*_value == m_PPlusExcludeDistance) {
 		return;
 	}
-	m_PPlusExcludeDistance = _value;
+	m_PPlusExcludeDistance = _value*_value;
 }
 
 float dollar::EnginePPlus::getPPlusExcludeDistance() {
-	return m_PPlusExcludeDistance;
+	return std::sqrt(m_PPlusExcludeDistance);
 }
 void dollar::EnginePPlus::setScaleKeepRatio(bool _value) {
 	if (_value == m_scaleKeepRatio) {
@@ -67,6 +69,78 @@ bool dollar::EnginePPlus::getScaleKeepRatio() {
 	return m_scaleKeepRatio;
 }
 
+void dollar::EnginePPlus::setPenalityNotLinkRef(float _value) {
+	m_penalityNotLinkRef = _value;
+}
+
+float dollar::EnginePPlus::getPenalityNotLinkRef() {
+	return m_penalityNotLinkRef;
+}
+void dollar::EnginePPlus::setPenalityNotLinkSample(float _value) {
+	m_penalityNotLinkSample = _value;
+}
+
+float dollar::EnginePPlus::getPenalityNotLinkSample() {
+	return m_penalityNotLinkSample;
+}
+
+
+float dollar::EnginePPlus::calculatePPlusDistanceSimple(const std::vector<vec2>& _points,
+                                                        const std::vector<vec2>& _reference,
+                                                        std::vector<std::pair<int32_t, int32_t>>& _dataDebug) {
+	std::vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
+	distance.resize(_points.size(), MAX_FLOAT);
+	// point Id that is link on the reference.
+	std::vector<int32_t> usedId;
+	usedId.resize(_points.size(), -1);
+	for (size_t iii=0; iii<_points.size(); iii++) {
+		float bestDistance = MAX_FLOAT;
+		int32_t kkkBest = -1;
+		for (size_t kkk=0; kkk<_reference.size(); ++kkk) {
+			float dist = (_points[iii]-_reference[kkk]).length2();
+			if (dist < bestDistance) {
+				bestDistance = dist;
+				kkkBest = kkk;
+			}
+		}
+		if (kkkBest != -1) {
+			// reject the distance ... if too big ...
+			if (bestDistance <= m_PPlusExcludeDistance) {
+				usedId[iii] = kkkBest;
+				distance[iii] = bestDistance;
+				//DOLLAR_INFO("set new link: " << iii << " with " << kkkBest << "     d=" << bestDistance);
+			}
+		}
+	}
+	double fullDistance = 0;
+	int32_t nbTestNotUsed = 0;
+	int32_t nbReferenceNotUsed = 0;
+	// now we count the full distance use and the number of local gesture not use
+	for (auto &it : distance) {
+		if (it < 100.0) {
+			fullDistance += it;
+		} else {
+			nbTestNotUsed++;
+		}
+	}
+	// we count the number of point in the gesture reference not used:
+	for (auto &it : usedId) {
+		if (it == -1) {
+			nbReferenceNotUsed++;
+		}
+	}
+	// now we add panality:
+	fullDistance += float(nbTestNotUsed)* m_penalityNotLinkSample;
+	fullDistance += float(nbReferenceNotUsed)* m_penalityNotLinkRef;
+	
+	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {
+		if (usedId[kkk] != -1) {
+			_dataDebug.push_back(std::make_pair(kkk, usedId[kkk]));
+		}
+	}
+	DOLLAR_DEBUG("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
+	return fullDistance;
+}
 
 
 float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _points,
@@ -132,8 +206,8 @@ float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _poin
 		}
 	}
 	// now we add panality:
-	fullDistance += float(nbTestNotUsed)* 0.1f;
-	fullDistance += float(nbReferenceNotUsed)* 0.1f;
+	fullDistance += float(nbTestNotUsed)* m_penalityNotLinkSample;
+	fullDistance += float(nbReferenceNotUsed)* m_penalityNotLinkRef;
 	
 	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {
 		if (usedId[kkk] != -1) {
@@ -239,9 +313,20 @@ dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<ve
 			//DOLLAR_ERROR("Reference path with no Value");
 			continue;
 		}
+		int32_t nbStrokeSample = _strokes.size();
+		int32_t nbStrokeRef = gesture->getPath().size();
+		/*
+		if (nbStrokeSample != nbStrokeRef) {
+			continue; //==> must have the same number of stroke ...
+		}
+		*/
 		float distance = MAX_FLOAT;
 		std::vector<std::pair<int32_t, int32_t>> dataPair;
 		distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair);
+		//distance = calculatePPlusDistanceSimple(points, gesture->getEnginePoints(), dataPair);
+		if (nbStrokeRef != nbStrokeSample) {
+			distance += 0.1f*float(std::abs(nbStrokeRef-nbStrokeSample));
+		}
 		//storeSVG("out_dollar/lib/recognizePPlus/" + gesture->getName() + "_" + etk::to_string(gesture->getId()) + ".svg", gesture, _strokes, points, dataPair, m_scaleKeepRatio);
 		for (size_t kkk=0; kkk<m_nbResult; ++kkk) {
 			if (distance < bestDistance[kkk]) {

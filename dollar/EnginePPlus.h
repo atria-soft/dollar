@@ -32,6 +32,16 @@ namespace dollar {
 			void setScaleKeepRatio(bool _value);
 			bool getScaleKeepRatio();
 		protected:
+			float m_penalityNotLinkRef;
+		public:
+			void setPenalityNotLinkRef(float _value);
+			float getPenalityNotLinkRef();
+		protected:
+			float m_penalityNotLinkSample;
+		public:
+			void setPenalityNotLinkSample(float _value);
+			float getPenalityNotLinkSample();
+		protected:
 			std::vector<ememory::SharedPtr<dollar::GesturePPlus>> m_gestures; //!< List of all loaded gesture in the engine
 		public:
 			EnginePPlus();
@@ -42,6 +52,9 @@ namespace dollar {
 			float calculatePPlusDistance(const std::vector<vec2>& _points,
 			                             const std::vector<vec2>& _reference,
 			                             std::vector<std::pair<int32_t, int32_t>>& _dataDebug);
+			float calculatePPlusDistanceSimple(const std::vector<vec2>& _points,
+			                                   const std::vector<vec2>& _reference,
+			                                   std::vector<std::pair<int32_t, int32_t>>& _dataDebug);
 	};
 }
 
