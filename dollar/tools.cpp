@@ -47,12 +47,23 @@ std::vector<vec2> dollar::rotateToZero(const std::vector<vec2>& _points) {
 	return rotateBy(_points, -rotation);
 }
 
+float maxKeepAspectRatio = 5.5f;
+
 // TODO : Rework this to have a correct scale with keeping aspect ration ... or not ...
 std::vector<vec2> dollar::scaleToOne(const std::vector<vec2>& _points, bool _keepAspectRation) {
 	dollar::Rectangle box(_points);
 	std::vector<vec2> out;
 	vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().y());
 	vec2 offset(0,0);
+	/*
+	float aspectRatio = box.getSize().x() / box.getSize().y();
+	if (aspectRatio < 1.0f) {
+		aspectRatio = 1.0f / aspectRatio;
+	}
+	if (aspectRatio > maxKeepAspectRatio) {
+		_keepAspectRation = true;
+	}
+	*/
 	if (_keepAspectRation == true) {
 		float val = 1;
 		offset = box.getSize() * val;
@@ -79,6 +90,15 @@ std::vector<std::vector<vec2>> dollar::scaleToOne(const std::vector<std::vector<
 	std::vector<std::vector<vec2>> out;
 	vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().y());
 	vec2 offset(0,0);
+	/*
+	float aspectRatio = box.getSize().x() / box.getSize().y();
+	if (aspectRatio < 1.0f) {
+		aspectRatio = 1.0f / aspectRatio;
+	}
+	if (aspectRatio > maxKeepAspectRatio) {
+		_keepAspectRation = true;
+	}
+	*/
 	if (_keepAspectRation == true) {
 		float val = 1;
 		offset = box.getSize() * val;

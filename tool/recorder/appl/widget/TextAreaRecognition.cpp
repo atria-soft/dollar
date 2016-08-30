@@ -85,6 +85,8 @@ void appl::widget::TextAreaRecognition::store(const std::string& _userName, cons
 	fileName = "HOME:DOLLAR/corpus/";
 	if (_value == "/") {
 		fileName += "slash";
+	} else if (_value == "\\") {
+		fileName += "back-slash";
 	} else {
 		fileName += _value;
 	}

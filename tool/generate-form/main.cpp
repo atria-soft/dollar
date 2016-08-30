@@ -165,6 +165,11 @@ bool testCorpus(const std::string& _srcCorpus) {
 		if (etk::end_with(it, ".json") == true) {
 			std::vector<std::string> path = etk::split(it, '/');
 			std::string elemName = etk::split(path[path.size()-1],'_')[0];
+			if (elemName == "slash") {
+				elemName = "/";
+			}if (elemName == "back-slash") {
+				elemName = "\\";
+			}
 			if (std::find(listOfElementInCorpus.begin(), listOfElementInCorpus.end(), elemName) == listOfElementInCorpus.end()) {
 				listOfElementInCorpus.push_back(elemName);
 			}
@@ -183,11 +188,17 @@ bool testCorpus(const std::string& _srcCorpus) {
 		TEST_PRINT("-- Generate FOR: '" << itTypeOfCorpus << "'");
 		TEST_PRINT("---------------------------------------------------------------------------");
 		std::vector<std::string> fileFiltered;
+		std::string fileNameIt = itTypeOfCorpus;
+		if (fileNameIt == "/") {
+			fileNameIt = "slash";
+		} else if (fileNameIt == "\\") {
+			fileNameIt = "back-slash";
+		}
 		for (auto &it : files) {
 			if (etk::end_with(it, ".json") == true) {
 				std::vector<std::string> path = etk::split(it, '/');
 				std::string filename = path[path.size()-1];
-				if (etk::start_with(filename, itTypeOfCorpus + "_") == true) {
+				if (etk::start_with(filename, fileNameIt + "_") == true) {
 					fileFiltered.push_back(it);
 				}
 			}
