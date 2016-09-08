@@ -35,26 +35,26 @@ def create(target, module_name):
 	    'appl/Windows.cpp',
 	    'appl/widget/TextAreaRecognition.cpp',
 	    ])
-	my_module.add_module_depend([
+	my_module.add_depend([
 	    'ewol',
 	    'ejson',
 	    'esvg',
 	    'dollar',
 	    #'dollar-data'
 	    ])
-	my_module.compile_flags('c++', [
-	    "-DPROJECT_NAME=\"\\\"" + my_module.name + "\\\"\"",
+	my_module.add_flag('c++', [
+	    "-DPROJECT_NAME=\"\\\"" + my_module.get_name() + "\\\"\"",
 	    "-DAPPL_VERSION=\"\\\"" + tools.version_to_string(get_version()) + "\\\"\""
 	    ])
 	my_module.add_path(tools.get_current_path(__file__))
-	my_module.pkg_set("VERSION_CODE", 1)
-	my_module.pkg_add("RIGHT", "WRITE_EXTERNAL_STORAGE")
+	my_module.set_pkg("VERSION_CODE", 1)
+	my_module.add_pkg("RIGHT", "WRITE_EXTERNAL_STORAGE")
 	
 	my_module.copy_path('data/icon.*','')
 	my_module.copy_path("data/freefont/*","fonts/")
 	my_module.copy_path('data/reference/*', "reference")
 	
-	my_module.pkg_set("ICON", os.path.join(tools.get_current_path(__file__), "data/icon.png"))
+	my_module.set_pkg("ICON", os.path.join(tools.get_current_path(__file__), "data/icon.png"))
 	return my_module
 
 

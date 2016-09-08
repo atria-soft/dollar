@@ -26,7 +26,7 @@ def get_version():
 
 def create(target, module_name):
 	my_module = module.Module(__file__, module_name, get_type())
-	my_module.add_extra_compile_flags()
+	my_module.add_extra_flags()
 	# add the file to compile:
 	my_module.add_src_file([
 		'dollar/debug.cpp',
@@ -51,7 +51,7 @@ def create(target, module_name):
 	# build in C++ mode
 	my_module.compile_version("c++", 2011)
 	# add dependency of the generic C++ library:
-	my_module.add_module_depend([
+	my_module.add_depend([
 	    'cxx',
 	    'elog',
 	    'etk',
