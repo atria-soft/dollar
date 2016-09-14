@@ -14,6 +14,9 @@
 #include <dollar/Gesture.h>
 #include <ememory/memory.h>
 
+/**
+ * @brief dollar library main namespace
+ */
 namespace dollar {
 	class Engine {
 		protected:

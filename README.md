@@ -1,8 +1,7 @@
 dollar
 ======
 
-`dollar` is a $1 and $N gesture recognition
-
+`dollar` is a $1, $N, $P and $P+ gesture recognition
 
 Instructions
 ============
