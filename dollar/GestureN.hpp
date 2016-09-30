@@ -3,12 +3,12 @@
  * @copyright 2016, Edouard DUPIN, all right reserved
  * @license APACHE v2.0 (see license file)
  */
-
 #pragma once
-#include <string>
-#include <etk/math/Vector2D.h>
 
-#include <dollar/Gesture.h>
+#include <etk/math/Vector2D.hpp>
+#include <dollar/Gesture.hpp>
+
+#include <string>
 
 namespace dollar {
 	class GestureN : public dollar::Gesture {

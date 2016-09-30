@@ -4,11 +4,11 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <dollar/EngineP.h>
-#include <dollar/debug.h>
-#include <dollar/Rectangle.h>
-#include <dollar/tools.h>
-#include <etk/os/FSNode.h>
+#include <dollar/EngineP.hpp>
+#include <dollar/debug.hpp>
+#include <dollar/Rectangle.hpp>
+#include <dollar/tools.hpp>
+#include <etk/os/FSNode.hpp>
 #include <math.h>
 #include <algorithm>
 #define MAX_FLOAT std::numeric_limits<float>::max()

@@ -4,14 +4,13 @@
  * @license PROPRIETARY (see license file)
  */
 
-#include <appl/debug.h>
-#include <appl/widget/TextAreaRecognition.h>
-#include <ewol/object/Manager.h>
-#include <etk/tool.h>
-#include <ejson/ejson.h>
-#include <esvg/esvg.h>
-//#include <algue/sha512.h>
-#include <etk/os/FSNode.h>
+#include <appl/debug.hpp>
+#include <appl/widget/TextAreaRecognition.hpp>
+#include <ewol/object/Manager.hpp>
+#include <etk/tool.hpp>
+#include <ejson/ejson.hpp>
+#include <esvg/esvg.hpp>
+#include <etk/os/FSNode.hpp>
 
 appl::widget::TextAreaRecognition::TextAreaRecognition() {
 	addObjectType("appl::widget::TextAreaRecognition");

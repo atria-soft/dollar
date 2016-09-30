@@ -4,9 +4,9 @@
  * @license APACHE v2.0 (see license file)
  */
 #pragma once
-#include <etk/types.h>
-#include <etk/math/Vector2D.h>
-#include <dollar/Rectangle.h>
+#include <etk/types.hpp>
+#include <etk/math/Vector2D.hpp>
+#include <dollar/Rectangle.hpp>
 
 namespace dollar {
 	/**

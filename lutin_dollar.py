@@ -44,7 +44,7 @@ def create(target, module_name):
 		])
 	
 	my_module.add_header_file([
-		'dollar/*.h',
+		'dollar/*.hpp',
 		],
 		destination_path="dollar")
 	

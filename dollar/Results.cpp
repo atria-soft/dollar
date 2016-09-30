@@ -4,8 +4,8 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <dollar/debug.h>
-#include <dollar/Results.h>
+#include <dollar/debug.hpp>
+#include <dollar/Results.hpp>
 
 
 dollar::Results::Results() {

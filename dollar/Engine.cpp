@@ -4,14 +4,14 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <dollar/Engine.h>
-#include <dollar/debug.h>
-#include <dollar/Rectangle.h>
-#include <dollar/tools.h>
-#include <etk/os/FSNode.h>
-#include <dollar/EngineN.h>
-#include <dollar/EngineP.h>
-#include <dollar/EnginePPlus.h>
+#include <dollar/Engine.hpp>
+#include <dollar/debug.hpp>
+#include <dollar/Rectangle.hpp>
+#include <dollar/tools.hpp>
+#include <etk/os/FSNode.hpp>
+#include <dollar/EngineN.hpp>
+#include <dollar/EngineP.hpp>
+#include <dollar/EnginePPlus.hpp>
 
 
 dollar::Engine::Engine():

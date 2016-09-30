@@ -4,13 +4,13 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <iostream>
-#include <dollar/EnginePPlus.h>
-#include <dollar/tools.h>
+#include <dollar/EnginePPlus.hpp>
+#include <dollar/tools.hpp>
+#include <etk/etk.hpp>
+#include <test-debug/debug.hpp>
+#include <etk/os/FSNode.hpp>
 
-#include <etk/etk.h>
-#include <test-debug/debug.h>
-#include <etk/os/FSNode.h>
+#include <iostream>
 #include <map>
 
 void usage(const std::string& _progName) {

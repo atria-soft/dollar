@@ -4,14 +4,14 @@
  * @license PROPRIETARY (see license file)
  */
 
-#include <ewol/ewol.h>
-#include <appl/debug.h>
-#include <appl/Windows.h>
-#include <ewol/widget/Label.h>
-#include <ewol/widget/Button.h>
-#include <ewol/widget/Entry.h>
-#include <appl/widget/TextAreaRecognition.h>
-#include <etk/tool.h>
+#include <ewol/ewol.hpp>
+#include <appl/debug.hpp>
+#include <appl/Windows.hpp>
+#include <ewol/widget/Label.hpp>
+#include <ewol/widget/Button.hpp>
+#include <ewol/widget/Entry.hpp>
+#include <appl/widget/TextAreaRecognition.hpp>
+#include <etk/tool.hpp>
 
 appl::Windows::Windows() :
   m_composer(nullptr),

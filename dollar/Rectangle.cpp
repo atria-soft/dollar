@@ -3,8 +3,8 @@
  * @copyright 2016, Edouard DUPIN, all right reserved
  * @license APACHE v2.0 (see license file)
  */
-#include <dollar/Rectangle.h>
-#include <dollar/debug.h>
+#include <dollar/Rectangle.hpp>
+#include <dollar/debug.hpp>
 
 #define MAX_FLOAT std::numeric_limits<float>::max()
 

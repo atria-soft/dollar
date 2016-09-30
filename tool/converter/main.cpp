@@ -5,10 +5,10 @@
  */
 
 #include <iostream>
-#include <dollar/Engine.h>
+#include <dollar/Engine.hpp>
 
-#include <etk/etk.h>
-#include <test-debug/debug.h>
+#include <etk/etk.hpp>
+#include <test-debug/debug.hpp>
 
 void usage(const std::string& _progName) {
 	TEST_PRINT("usage:");

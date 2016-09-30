@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <etk/math/Vector2D.h>
+#include <etk/math/Vector2D.hpp>
+#include <dollar/Results.hpp>
+#include <dollar/Engine.hpp>
+#include <dollar/GestureP.hpp>
 #include <limits>
 #include <iostream>
-#include <dollar/Results.h>
 #include <string>
-#include <dollar/Engine.h>
-#include <dollar/GestureP.h>
 
 namespace dollar {
 	class EngineP : public dollar::Engine {

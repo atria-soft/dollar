@@ -5,11 +5,11 @@
  */
 #pragma once
 
+#include <etk/math/Vector2D.hpp>
 #include <math.h>
 #include <string>
 #include <list>
 #include <vector>
-#include <etk/math/Vector2D.h>
 
 namespace dollar {
 	/**

@@ -4,8 +4,9 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <dollar/tools.h>
-#include <dollar/debug.h>
+#include <dollar/tools.hpp>
+#include <dollar/debug.hpp>
+
 #include <math.h>
 #include <algorithm>
 

@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <etk/math/Vector2D.h>
+#include <etk/math/Vector2D.hpp>
+#include <dollar/Results.hpp>
+#include <dollar/Gesture.hpp>
+#include <ememory/memory.hpp>
 #include <limits>
 #include <iostream>
-#include <dollar/Results.h>
 #include <string>
-#include <dollar/Gesture.h>
-#include <ememory/memory.h>
 
 /**
  * @brief dollar library main namespace

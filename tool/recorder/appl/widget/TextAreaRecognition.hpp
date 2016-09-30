@@ -5,12 +5,12 @@
  */
 #pragma once
 
-#include <ewol/widget/Widget.h>
-#include <ewol/compositing/Drawing.h>
-#include <ewol/compositing/Text.h>
-#include <ewol/widget/Manager.h>
+#include <ewol/widget/Widget.hpp>
+#include <ewol/compositing/Drawing.hpp>
+#include <ewol/compositing/Text.hpp>
+#include <ewol/widget/Manager.hpp>
 
-#include <dollar/Engine.h>
+#include <dollar/Engine.hpp>
 
 namespace appl {
 	class DrawingLine {

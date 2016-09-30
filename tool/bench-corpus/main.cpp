@@ -5,12 +5,12 @@
  */
 
 #include <iostream>
-#include <dollar/EnginePPlus.h>
-#include <dollar/tools.h>
+#include <dollar/EnginePPlus.hpp>
+#include <dollar/tools.hpp>
 
-#include <etk/etk.h>
-#include <test-debug/debug.h>
-#include <etk/os/FSNode.h>
+#include <etk/etk.hpp>
+#include <test-debug/debug.hpp>
+#include <etk/os/FSNode.hpp>
 #include <map>
 
 void usage(const std::string& _progName) {

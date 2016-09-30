@@ -4,11 +4,11 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <etk/types.h>
+#include <etk/types.hpp>
 
 #pragma once
 
-#include <elog/log.h>
+#include <elog/log.hpp>
 
 namespace dollar {
 	int32_t getLogId();
