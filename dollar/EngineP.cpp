@@ -9,7 +9,7 @@
 #include <dollar/Rectangle.hpp>
 #include <dollar/tools.hpp>
 #include <etk/os/FSNode.hpp>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #define MAX_FLOAT std::numeric_limits<float>::max()
 

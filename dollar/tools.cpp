@@ -7,7 +7,7 @@
 #include <dollar/tools.hpp>
 #include <dollar/debug.hpp>
 
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 
 

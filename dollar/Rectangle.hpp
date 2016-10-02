@@ -6,7 +6,7 @@
 #pragma once
 
 #include <etk/math/Vector2D.hpp>
-#include <math.h>
+#include <cmath>
 #include <string>
 #include <list>
 #include <vector>

@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <math.h>
+#include <cmath>
 #include <string>
 #include <list>
 #include <vector>

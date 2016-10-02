@@ -4,13 +4,13 @@
  * @license APACHE v2.0 (see license file)
  */
 
-#include <dollar/debug.h>
-#include <dollar/GestureP.h>
-#include <dollar/tools.h>
-#include <etk/os/FSNode.h>
-#include <ejson/ejson.h>
-#include <esvg/esvg.h>
-#include <etk/stdTools.h>
+#include <dollar/debug.hpp>
+#include <dollar/GestureP.hpp>
+#include <dollar/tools.hpp>
+#include <etk/os/FSNode.hpp>
+#include <ejson/ejson.hpp>
+#include <esvg/esvg.hpp>
+#include <etk/stdTools.hpp>
 
 dollar::GestureP::GestureP() {
 	
