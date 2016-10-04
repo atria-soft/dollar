@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import lutin.module as module
+import lutin.debug as debug
 import lutin.tools as tools
 import os
 
@@ -27,8 +27,7 @@ def get_maintainer():
 def get_version():
 	return [0,1]
 
-def create(target, module_name):
-	my_module = module.Module(__file__, module_name, get_type())
+def configure(target, my_module):
 	my_module.add_src_file([
 	    'appl/Main.cpp',
 	    'appl/debug.cpp',
@@ -46,7 +45,7 @@ def create(target, module_name):
 	    "-DPROJECT_NAME=\"\\\"" + my_module.get_name() + "\\\"\"",
 	    "-DAPPL_VERSION=\"\\\"" + tools.version_to_string(get_version()) + "\\\"\""
 	    ])
-	my_module.add_path(tools.get_current_path(__file__))
+	my_module.add_path(".")
 	my_module.set_pkg("VERSION_CODE", 1)
 	my_module.add_pkg("RIGHT", "WRITE_EXTERNAL_STORAGE")
 	
@@ -54,8 +53,8 @@ def create(target, module_name):
 	my_module.copy_path("data/freefont/*","fonts/")
 	my_module.copy_path('data/reference/*', "reference")
 	
-	my_module.set_pkg("ICON", os.path.join(tools.get_current_path(__file__), "data/icon.png"))
-	return my_module
+	my_module.set_pkg("ICON", "data/icon.png")
+	return True
 
 
 

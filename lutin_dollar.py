@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import lutin.module as module
+import lutin.debug as debug
 import lutin.tools as tools
 
 
@@ -24,29 +24,28 @@ def get_maintainer():
 def get_version():
 	return "version.txt"
 
-def create(target, module_name):
-	my_module = module.Module(__file__, module_name, get_type())
+def configure(target, my_module):
 	my_module.add_extra_flags()
 	# add the file to compile:
 	my_module.add_src_file([
-		'dollar/debug.cpp',
-		'dollar/Engine.cpp',
-		'dollar/EngineN.cpp',
-		'dollar/EngineP.cpp',
-		'dollar/EnginePPlus.cpp',
-		'dollar/Gesture.cpp',
-		'dollar/GestureN.cpp',
-		'dollar/GestureP.cpp',
-		'dollar/GesturePPlus.cpp',
-		'dollar/Results.cpp',
-		'dollar/tools.cpp',
-		'dollar/Rectangle.cpp'
-		])
+	    'dollar/debug.cpp',
+	    'dollar/Engine.cpp',
+	    'dollar/EngineN.cpp',
+	    'dollar/EngineP.cpp',
+	    'dollar/EnginePPlus.cpp',
+	    'dollar/Gesture.cpp',
+	    'dollar/GestureN.cpp',
+	    'dollar/GestureP.cpp',
+	    'dollar/GesturePPlus.cpp',
+	    'dollar/Results.cpp',
+	    'dollar/tools.cpp',
+	    'dollar/Rectangle.cpp'
+	    ])
 	
 	my_module.add_header_file([
-		'dollar/*.hpp',
-		],
-		destination_path="dollar")
+	    'dollar/*.hpp',
+	    ],
+	    destination_path="dollar")
 	
 	# build in C++ mode
 	my_module.compile_version("c++", 2011)
@@ -59,6 +58,6 @@ def create(target, module_name):
 	    'esvg',
 	    'ememory',
 	    ])
-	return my_module
+	return True
 
 
