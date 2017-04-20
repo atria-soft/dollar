@@ -297,7 +297,8 @@ static void storeSVG(const std::string& _fileName,
 
 
 dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<vec2>>& _strokes) {
-	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, m_scaleKeepRatio);
+	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, false);
+	std::vector<vec2> pointsKeep = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, true);
 	// Keep maximum 5 results ...
 	float bestDistance[m_nbResult];
 	int32_t indexOfBestMatch[m_nbResult];
@@ -322,7 +323,11 @@ dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<ve
 		*/
 		float distance = MAX_FLOAT;
 		std::vector<std::pair<int32_t, int32_t>> dataPair;
-		distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair);
+		if (gesture->getKeepAspectRatio() == true) {
+			distance = calculatePPlusDistance(pointsKeep, gesture->getEnginePoints(), dataPair);
+		} else {
+			distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair);
+		}
 		//distance = calculatePPlusDistanceSimple(points, gesture->getEnginePoints(), dataPair);
 		if (nbStrokeRef != nbStrokeSample) {
 			distance += 0.1f*float(std::abs(nbStrokeRef-nbStrokeSample));

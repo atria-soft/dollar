@@ -56,31 +56,25 @@ std::vector<vec2> dollar::scaleToOne(const std::vector<vec2>& _points, bool _kee
 	std::vector<vec2> out;
 	vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().y());
 	vec2 offset(0,0);
-	/*
-	float aspectRatio = box.getSize().x() / box.getSize().y();
-	if (aspectRatio < 1.0f) {
-		aspectRatio = 1.0f / aspectRatio;
-	}
-	if (aspectRatio > maxKeepAspectRatio) {
-		_keepAspectRation = true;
-	}
-	*/
 	if (_keepAspectRation == true) {
-		float val = 1;
-		offset = box.getSize() * val;
 		if (box.getSize().x() > box.getSize().y()) {
-			val = 1.0f/box.getSize().x();
-			offset = vec2(0.0f, (1.0f-offset.y())*0.5f);
+			//if (box.getSize().y()/box.getSize().x() < 0.75f)
+			{
+				vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().x());
+				offset = vec2(0.0f, (1.0f-box.getSize().y()/box.getSize().x())*0.5f);
+			}
 		} else {
-			val = 1.0f/box.getSize().y();
-			offset = vec2((1.0f-offset.x())*0.5f, 0.0f);
+			//if (box.getSize().x()/box.getSize().y() < 0.75f)
+			{
+				vec2 scale(1.0f/box.getSize().y(), 1.0f/box.getSize().y());
+				offset = vec2((1.0f-box.getSize().x()/box.getSize().y())*0.5f, 0.0f);
+			}
 		}
-		scale = vec2(val,val);
 	}
 	for (auto &it : _points) {
 		vec2 tmp = it - box.getPos();
 		tmp *= scale;
-		//tmp += offset;
+		tmp += offset;
 		out.push_back(tmp);
 	}
 	return out;
@@ -91,33 +85,27 @@ std::vector<std::vector<vec2>> dollar::scaleToOne(const std::vector<std::vector<
 	std::vector<std::vector<vec2>> out;
 	vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().y());
 	vec2 offset(0,0);
-	/*
-	float aspectRatio = box.getSize().x() / box.getSize().y();
-	if (aspectRatio < 1.0f) {
-		aspectRatio = 1.0f / aspectRatio;
-	}
-	if (aspectRatio > maxKeepAspectRatio) {
-		_keepAspectRation = true;
-	}
-	*/
 	if (_keepAspectRation == true) {
-		float val = 1;
-		offset = box.getSize() * val;
 		if (box.getSize().x() > box.getSize().y()) {
-			val = 1.0f/box.getSize().x();
-			offset = vec2(0.0f, (1.0f-offset.y())*0.5f);
+			//if (box.getSize().y()/box.getSize().x() < 0.75f)
+			{
+				vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().x());
+				offset = vec2(0.0f, (1.0f-box.getSize().y()/box.getSize().x())*0.5f);
+			}
 		} else {
-			val = 1.0f/box.getSize().y();
-			offset = vec2((1.0f-offset.x())*0.5f, 0.0f);
+			//if (box.getSize().x()/box.getSize().y() < 0.75f)
+			{
+				vec2 scale(1.0f/box.getSize().y(), 1.0f/box.getSize().y());
+				offset = vec2((1.0f-box.getSize().x()/box.getSize().y())*0.5f, 0.0f);
+			}
 		}
-		scale = vec2(val,val);
 	}
 	for (auto &it : _points) {
 		std::vector<vec2> stroke;
 		for (auto &itPoint : it) {
 			vec2 tmp = itPoint - box.getPos();
 			tmp *= scale;
-			//tmp += offset;
+			tmp += offset;
 			stroke.push_back(tmp);
 		}
 		out.push_back(stroke);

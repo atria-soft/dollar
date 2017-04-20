@@ -15,10 +15,17 @@ namespace dollar {
 		protected:
 			std::string m_name;
 			uint32_t m_subId;
+			bool m_keepAspectRatio;
 			std::vector<std::vector<vec2>> m_path;
 		public:
 			Gesture();
 			virtual ~Gesture() = default;
+			void setKeepAspectRatio(bool _value) {
+				m_keepAspectRatio = _value;
+			}
+			bool getKeepAspectRatio() {
+				return m_keepAspectRatio;
+			}
 			bool load(const std::string& _filename);
 			bool store(const std::string& _filename);
 			void set(const std::string& _name, uint32_t _subId, std::vector<std::vector<vec2>> _path);

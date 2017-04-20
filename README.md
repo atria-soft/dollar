@@ -29,6 +29,48 @@ Compile software:
 	lutin dollar-test?build?run
 
 
+To generate a new corpus:
+-------------------------
+
+Simply install the basic software that generate corpus with writing data (hand or stylet)
+
+	cd WORKING_DIRECTORY
+	lutin -tAndroid dollar-recorder?build?install
+
+The corpus is register on the android board in the path /sdcard/DOLLAR/corpus
+
+To add it at hte current corpus:
+
+	cd WORKING_DIRECTORY/dollar/data/corpus/
+	XXXXXXX/android/sdk/platform-tools/adb pull /sdcard/DOLLAR/corpus .
+
+Use the new corpus to generate new symbols:
+-------------------------------------------
+
+a generic program is designed to do this: It have some parameter, but we keep in system the best one we have
+
+	cd WORKING_DIRECTORY
+	lutin -mdebug -cclang dollar-generate-form?build?run:--keep_ratio:appl_private/dollar/data/corpus/
+
+The processing can take long time ...
+
+The result are availlable on out_dollar/generate-form/corpus/
+
+update the corpus for the applications:
+
+	rm appl_private/dollar/tool/recorder/data/reference/*
+	cp out_dollar/generate-form/corpus/* appl_private/dollar/tool/recorder/data/reference/
+
+
+Bench the corpus:
+-----------------
+
+We check directly on the corpus reference
+
+	cd WORKING_DIRECTORY
+	lutin -cclang -mdebug dollar-bench-corpus?build?run:--keep_ratio:out_dollar/generate-form/corpus:appl_private/dollar/data/corpus/
+
+
 License (APACHE v2.0)
 =====================
 Copyright dollar Edouard DUPIN

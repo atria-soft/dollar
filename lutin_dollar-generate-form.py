@@ -10,7 +10,7 @@ def get_sub_type():
 	return "TOOL"
 
 def get_desc():
-	return "Dollar converter svg to json and json to SVG"
+	return "Dollar generator of all needed form to have the best text recognition"
 
 def get_licence():
 	return "APACHE-2"

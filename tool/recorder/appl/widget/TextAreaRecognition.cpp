@@ -23,6 +23,7 @@ void appl::widget::TextAreaRecognition::init() {
 	//m_dollarEngine.loadPath("DATA:text");
 	m_dollarEngine = dollar::createEngine("$P+");
 	m_dollarEngine->loadPath("DATA:reference");
+	m_dollarEngine->setScaleKeepRatio(true);
 	markToRedraw();
 	// connect a periodic update ...
 	m_periodicConnection = getObjectManager().periodicCall.connect(this, &appl::widget::TextAreaRecognition::callbackPeriodicUpdate);
