@@ -112,6 +112,12 @@ namespace dollar {
 	 * @return new list of points
 	 */
 	std::vector<vec2> normalizePathToPoints(std::vector<std::vector<vec2>> _points, float _distance, bool _keepAspectRatio);
+	/**
+	 * @brief get the aspect ratio of a list of points
+	 * @param[in] _points List of points
+	 * @return the aspect ratio
+	 */
+	float getAspectRatio(std::vector<std::vector<vec2>> _points);
 }
 
 

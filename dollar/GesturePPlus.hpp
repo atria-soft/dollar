@@ -16,6 +16,7 @@ namespace dollar {
 			GesturePPlus();
 		protected:
 			std::vector<vec2> m_enginePoints;
+			float m_aspectRatio; // original aspect ratio
 		public:
 			// Configure the reference gesture for recognition...
 			void configure(float _distance, bool _keepAspectRatio);
@@ -27,6 +28,9 @@ namespace dollar {
 			}
 			std::vector<std::vector<vec2>>& getPath() {
 				return m_path;
+			}
+			const float& getAspectRatio() const {
+				return m_aspectRatio;
 			}
 	};
 }

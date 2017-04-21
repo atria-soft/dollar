@@ -241,6 +241,14 @@ std::vector<vec2> dollar::normalizePath(std::vector<vec2> _points, size_t _nbSam
 	return translateBariCenterToZero(_points);
 }
 
+float dollar::getAspectRatio(std::vector<std::vector<vec2>> _points) {
+	dollar::Rectangle box(_points);
+	if (box.getSize().x() < box.getSize().y()) {
+		return 1.0f - box.getSize().x() / box.getSize().y();
+	} else {
+		return -(1.0f - box.getSize().y() / box.getSize().x());
+	}
+}
 
 std::vector<vec2> dollar::normalizePathToPoints(std::vector<std::vector<vec2>> _points, float _distance, bool _keepAspectRatio) {
 	// Scale point to (0.0,0.0) position and (1.0,1.0) size

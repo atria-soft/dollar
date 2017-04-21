@@ -51,7 +51,9 @@ namespace dollar {
 		protected:
 			float calculatePPlusDistance(const std::vector<vec2>& _points,
 			                             const std::vector<vec2>& _reference,
-			                             std::vector<std::pair<int32_t, int32_t>>& _dataDebug);
+			                             std::vector<std::pair<int32_t, int32_t>>& _dataDebug,
+			                             float _inputAspectRatio,
+			                             float _referenceAspectRatio);
 			float calculatePPlusDistanceSimple(const std::vector<vec2>& _points,
 			                                   const std::vector<vec2>& _reference,
 			                                   std::vector<std::pair<int32_t, int32_t>>& _dataDebug);

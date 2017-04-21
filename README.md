@@ -71,6 +71,17 @@ We check directly on the corpus reference
 	lutin -cclang -mdebug dollar-bench-corpus?build?run:--keep_ratio:out_dollar/generate-form/corpus:appl_private/dollar/data/corpus/
 
 
+Bench result auto corpus test ...
+---------------------------------
+
+Test with a keep ratio:                       81.62%
+Test with a No keep ratio:                    75.63%
+Test with a keep ratio <75%:                  80.80%
+Automatic detect keep ratio:                  54%    ==> remove code duplication
+Test keep ratio with a panality of distance:  81.92%
+idem previous + check the number of points
+
+
 License (APACHE v2.0)
 =====================
 Copyright dollar Edouard DUPIN

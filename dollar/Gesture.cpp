@@ -65,7 +65,7 @@ std::vector<std::vector<vec2>> dollar::loadPoints(const std::string& _fileName, 
 dollar::Gesture::Gesture():
   m_name(""),
   m_subId(0),
-  m_keepAspectRatio(false),
+  m_aspectRatio(0.0f),
   m_path(){
 	
 }
@@ -90,7 +90,7 @@ bool dollar::Gesture::loadJSON(const std::string& _fileName) {
 	}
 	m_name = doc["value"].toString().get();
 	m_subId = doc["sub-id"].toNumber().getU64(),
-	m_keepAspectRatio = doc["keep-aspect-ratio"].toBoolean().get(),
+	m_aspectRatio = doc["aspect-ratio"].toNumber().get(),
 	m_path = loadPointsJson(doc);
 	DOLLAR_DEBUG("Load gesture : " << m_name << " id=" << m_subId << " nb_elem=" << m_path.size());
 	return true;
@@ -135,7 +135,7 @@ void dollar::Gesture::storeJSON(const std::string& _fileName) {
 	doc.add("type", ejson::String("REFERENCE"));
 	doc.add("value", ejson::String(m_name));
 	doc.add("sub-id", ejson::Number(m_subId));
-	doc.add("keep-aspect-ratio", ejson::Boolean(m_keepAspectRatio));
+	doc.add("aspect-ratio", ejson::Number(m_aspectRatio));
 	ejson::Array data;
 	doc.add("data", data);
 	for (auto &it : m_path) {

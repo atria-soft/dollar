@@ -20,5 +20,6 @@ void dollar::GesturePPlus::configure(float _distance, bool _keepAspectRatio) {
 	m_enginePoints.clear();
 	// Generates dots:
 	m_enginePoints = dollar::normalizePathToPoints(m_path, _distance, _keepAspectRatio);
+	m_aspectRatio = dollar::getAspectRatio(m_path);
 	DOLLAR_VERBOSE("create " << m_enginePoints.size() << " points");
 }

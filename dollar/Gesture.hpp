@@ -15,16 +15,16 @@ namespace dollar {
 		protected:
 			std::string m_name;
 			uint32_t m_subId;
-			bool m_keepAspectRatio;
+			float m_aspectRatio;
 			std::vector<std::vector<vec2>> m_path;
 		public:
 			Gesture();
 			virtual ~Gesture() = default;
-			void setKeepAspectRatio(bool _value) {
-				m_keepAspectRatio = _value;
+			void setAspectRatio(float _value) {
+				m_aspectRatio = _value;
 			}
-			bool getKeepAspectRatio() {
-				return m_keepAspectRatio;
+			float getKeepAspectRatio() {
+				return m_aspectRatio;
 			}
 			bool load(const std::string& _filename);
 			bool store(const std::string& _filename);
@@ -42,5 +42,9 @@ namespace dollar {
 				return m_subId;
 			}
 	};
+	/**
+	 * @brief Load all point from a specific file
+	 *
+	 */
 	std::vector<std::vector<vec2>> loadPoints(const std::string& _fileName, std::string* _label=nullptr, std::string* _type=nullptr);
 }

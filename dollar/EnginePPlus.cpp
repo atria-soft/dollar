@@ -145,7 +145,9 @@ float dollar::EnginePPlus::calculatePPlusDistanceSimple(const std::vector<vec2>&
 
 float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _points,
                                                   const std::vector<vec2>& _reference,
-                                                  std::vector<std::pair<int32_t, int32_t>>& _dataDebug) {
+                                                  std::vector<std::pair<int32_t, int32_t>>& _dataDebug,
+                                                  float _inputAspectRatio,
+                                                  float _referenceAspectRatio) {
 	std::vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
 	distance.resize(_points.size(), MAX_FLOAT);
 	// point Id that is link on the reference.
@@ -208,6 +210,8 @@ float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _poin
 	// now we add panality:
 	fullDistance += float(nbTestNotUsed)* m_penalityNotLinkSample;
 	fullDistance += float(nbReferenceNotUsed)* m_penalityNotLinkRef;
+	fullDistance += std::abs(_inputAspectRatio - _referenceAspectRatio)*m_penalityNotLinkRef;
+	
 	
 	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {
 		if (usedId[kkk] != -1) {
@@ -297,8 +301,8 @@ static void storeSVG(const std::string& _fileName,
 
 
 dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<vec2>>& _strokes) {
-	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, false);
-	std::vector<vec2> pointsKeep = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, true);
+	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, m_scaleKeepRatio);
+	float inputAspectRatio = dollar::getAspectRatio(_strokes);
 	// Keep maximum 5 results ...
 	float bestDistance[m_nbResult];
 	int32_t indexOfBestMatch[m_nbResult];
@@ -323,11 +327,7 @@ dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<ve
 		*/
 		float distance = MAX_FLOAT;
 		std::vector<std::pair<int32_t, int32_t>> dataPair;
-		if (gesture->getKeepAspectRatio() == true) {
-			distance = calculatePPlusDistance(pointsKeep, gesture->getEnginePoints(), dataPair);
-		} else {
-			distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair);
-		}
+		distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair, inputAspectRatio, gesture->getAspectRatio());
 		//distance = calculatePPlusDistanceSimple(points, gesture->getEnginePoints(), dataPair);
 		if (nbStrokeRef != nbStrokeSample) {
 			distance += 0.1f*float(std::abs(nbStrokeRef-nbStrokeSample));
