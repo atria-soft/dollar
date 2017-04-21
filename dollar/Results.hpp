@@ -11,12 +11,29 @@
 #include <vector>
 
 namespace dollar {
+	class ResultData {
+		public:
+			std::string value;
+			float confidence;
+			#ifdef DOLLAR_ANNALYSER_ENABLE
+				float distance;
+				int32_t deltaLines; //!< number of line in delta if > 0 ==> more lines in the reference
+				float deltaRatio:
+				int32_t deltaDots; //!< number of dots in delta if > 0 ==> more dots in the reference
+			#endif
+		public:
+			ResultData(const std::string& _value, float _confidence):
+			  value(_value),
+			  confidence(_confidence) {
+				
+			}
+	};
 	class Results {
 		protected:
-			std::vector<std::pair<std::string,float>> m_values;
+			std::vector<ResultData> m_values;
 		public:
 			Results();
-			bool haveMath() const;
+			bool haveMatch() const;
 			size_t getSize() const;
 			std::string getName(size_t _id=0) const;
 			float getConfidence(size_t _id=0) const;

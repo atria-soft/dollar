@@ -228,7 +228,7 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 		//agregateResults[label+" "+type].push_back(std::make_pair(res,it));
 		agregateResults[label].push_back(std::make_pair(res,it));
 		
-		if (res.haveMath() == false) {
+		if (res.haveMatch() == false) {
 			TEST_INFO("   Recognise noting ...");
 			continue;
 		}

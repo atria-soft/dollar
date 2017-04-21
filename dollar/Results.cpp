@@ -12,7 +12,7 @@ dollar::Results::Results() {
 	// nothing to do ...
 }
 
-bool dollar::Results::haveMath() const {
+bool dollar::Results::haveMatch() const {
 	return m_values.size() != 0;
 }
 
@@ -25,7 +25,7 @@ std::string dollar::Results::getName(size_t _id) const {
 		DOLLAR_ERROR("request acces error result out of range (name)");
 		return "";
 	}
-	return m_values[_id].first;
+	return m_values[_id].value;
 }
 
 float dollar::Results::getConfidence(size_t _id) const {
@@ -33,11 +33,11 @@ float dollar::Results::getConfidence(size_t _id) const {
 		DOLLAR_ERROR("request acces error result out of range (value)");
 		return 0;
 	}
-	return m_values[_id].second;
+	return m_values[_id].confidence;
 }
 
 void dollar::Results::addValue(const std::string& _name, float _confidence) {
-	m_values.push_back(std::make_pair(_name, _confidence));
+	m_values.push_back(ResultData(_name, _confidence));
 }
 
 
