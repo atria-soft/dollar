@@ -76,12 +76,21 @@ void dollar::EnginePPlus::setPenalityNotLinkRef(float _value) {
 float dollar::EnginePPlus::getPenalityNotLinkRef() {
 	return m_penalityNotLinkRef;
 }
+
 void dollar::EnginePPlus::setPenalityNotLinkSample(float _value) {
 	m_penalityNotLinkSample = _value;
 }
 
 float dollar::EnginePPlus::getPenalityNotLinkSample() {
 	return m_penalityNotLinkSample;
+}
+
+void dollar::EnginePPlus::setPenalityAspectRatio(float _value) {
+	m_penalityAspectRatio = _value;
+}
+
+float dollar::EnginePPlus::getPenalityAspectRatio() {
+	return m_penalityAspectRatio;
 }
 
 
@@ -210,7 +219,7 @@ float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _poin
 	// now we add panality:
 	fullDistance += float(nbTestNotUsed)* m_penalityNotLinkSample;
 	fullDistance += float(nbReferenceNotUsed)* m_penalityNotLinkRef;
-	fullDistance += std::abs(_inputAspectRatio - _referenceAspectRatio)*m_penalityNotLinkRef;
+	fullDistance += std::abs(_inputAspectRatio - _referenceAspectRatio)*m_penalityAspectRatio;
 	
 	
 	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {

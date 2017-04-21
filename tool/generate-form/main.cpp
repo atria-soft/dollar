@@ -252,6 +252,7 @@ bool testCorpus(const std::string& _srcCorpus) {
 			reco.setPPlusExcludeDistance(distanceExclude);
 			reco.setPenalityNotLinkRef(penalityRef);
 			reco.setPenalityNotLinkSample(penalitySample);
+			reco.setPenalityAspectRatio(penalityAspectRatio);
 			reco.addGesture(gest);
 			std::vector<std::string> path = etk::split(fileFiltered[iii], '/');
 			std::string filename = path[path.size()-1];

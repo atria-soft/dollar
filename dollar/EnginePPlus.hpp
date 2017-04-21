@@ -42,6 +42,11 @@ namespace dollar {
 			void setPenalityNotLinkSample(float _value);
 			float getPenalityNotLinkSample();
 		protected:
+			float m_penalityAspectRatio;
+		public:
+			void setPenalityAspectRatio(float _value);
+			float getPenalityAspectRatio();
+		protected:
 			std::vector<ememory::SharedPtr<dollar::GesturePPlus>> m_gestures; //!< List of all loaded gesture in the engine
 		public:
 			EnginePPlus();

@@ -13,16 +13,24 @@
 #include <etk/os/FSNode.hpp>
 #include <map>
 
+static bool keepAspectRatio = false;
+static float distanceReference = 0.1f; // distance of the gesture reference [0.02, 0.3]
+static float distanceExclude = 0.2f; // distance of the exclusion point     [0.1, 1.0]
+static float penalityRef = 0.1;
+static float penalitySample = 0.1;
+static float penalityAspectRatio = 0.2; //!< ==> result += delta aspect ratio * penality
+
 void usage(const std::string& _progName) {
 	TEST_PRINT("usage:");
 	TEST_PRINT("    " << _progName << " [option] reference_gesture corpus_path");
 	TEST_PRINT("        [option]");
 	TEST_PRINT("            -h --help             Display this help");
-	TEST_PRINT("            --keep_ratio          Keep aspect ratio for the form recognition");
-	TEST_PRINT("            --dist-check=flaot    distance between points in the system recognition");
-	TEST_PRINT("            --dist-excl=flaot     distance to exclude a point in a pathern matching ...");
-	TEST_PRINT("            --penal-ref=float     Penality for reference when not connected");
-	TEST_PRINT("            --penal-sample=float  Penality for sample when not connected");
+	TEST_PRINT("            --keep_ratio                 Keep aspect ratio for the form recognition (default:" + etk::to_string(keepAspectRatio) + ")");
+	TEST_PRINT("            --dist-check=flaot           Distance between points in the system recognition (default:" + etk::to_string(distanceReference) + ")");
+	TEST_PRINT("            --dist-excl=flaot            Distance to exclude a point in a pathern matching ... (default:" + etk::to_string(distanceExclude) + ")");
+	TEST_PRINT("            --penal-ref=float            Penality for reference when not connected (default:" + etk::to_string(penalityRef) + ")");
+	TEST_PRINT("            --penal-sample=float         Penality for sample when not connected (default:" + etk::to_string(penalitySample) + ")");
+	TEST_PRINT("            --penal-aspect-ratio=float   Penality for the distance of aspect ratio (default:" + etk::to_string(penalityAspectRatio) + ")");
 	TEST_PRINT("        parameters (must be here)");
 	TEST_PRINT("            reference_gesture   Path of the reference gestures");
 	TEST_PRINT("            corpus_path         Path of the corpus files");
@@ -30,11 +38,6 @@ void usage(const std::string& _progName) {
 
 bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus);
 
-static bool keepAspectRatio = false;
-static float distanceReference = 0.1f; // distance of the gesture reference [0.02, 0.3]
-static float distanceExclude = 0.2f; // distance of the exclusion point     [0.1, 1.0]
-static float penalityRef = 0.1;
-static float penalitySample = 0.1;
 
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
@@ -74,6 +77,12 @@ int main(int _argc, const char *_argv[]) {
 			std::string val(&arg[15]);
 			penalityRef = etk::string_to_float(val);
 			TEST_PRINT("configure penalitySample=" << penalitySample);
+			continue;
+		}
+		if (etk::start_with(arg,"--penal-aspect-ratio=") == true) {
+			std::string val(&arg[20]);
+			penalityAspectRatio = etk::string_to_float(val);
+			TEST_PRINT("configure penalityAspectRatio=" << penalityAspectRatio);
 			continue;
 		}
 		if(    arg[0] == '-'
@@ -131,7 +140,10 @@ void annalyseResult(std::map<std::string, std::vector<std::pair<dollar::Results,
 		int32_t nbRecognise = 0;
 		int32_t nbtested = 0;
 		std::string label = etk::split(it.first, ' ')[0];
-		std::string type = etk::split(it.first, ' ')[1];
+		std::string type;
+		if (etk::split(it.first, ' ').size() > 1) {
+			type = etk::split(it.first, ' ')[1];
+		}
 		std::vector<std::string> listFull;
 		std::vector<std::string> listWrong;
 		std::map<std::string, int32_t> wrongValues;
@@ -179,6 +191,7 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 	reco.setPPlusExcludeDistance(distanceExclude);
 	reco.setPenalityNotLinkRef(penalityRef);
 	reco.setPenalityNotLinkSample(penalitySample);
+	reco.setPenalityAspectRatio(penalityAspectRatio);
 	TEST_PRINT("---------------------------------------------------------------------------");
 	TEST_PRINT("-- Load Gestures: " << _srcGesture);
 	TEST_PRINT("---------------------------------------------------------------------------");
@@ -212,7 +225,8 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 		TEST_PRINT("Test '" << label << "' type=" << type << "       " << filename);
 		dollar::Results res = reco.recognize(listPoints);
 		
-		agregateResults[label+" "+type].push_back(std::make_pair(res,it));
+		//agregateResults[label+" "+type].push_back(std::make_pair(res,it));
+		agregateResults[label].push_back(std::make_pair(res,it));
 		
 		if (res.haveMath() == false) {
 			TEST_INFO("   Recognise noting ...");
@@ -233,6 +247,9 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 				TEST_WARNING("         " << res.getName() << " score=" << res.getConfidence());
 			}else {
 				TEST_ERROR("         " << res.getName() << " score=" << res.getConfidence());
+				for (size_t iii=1; iii<res.getSize() || iii<4; ++iii) {
+					TEST_WARNING("         " << res.getName(iii) << " score=" << res.getConfidence(iii));
+				}
 			}
 		#endif
 	}
