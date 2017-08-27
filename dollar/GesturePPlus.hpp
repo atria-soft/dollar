@@ -8,25 +8,25 @@
 #include <etk/math/Vector2D.hpp>
 #include <dollar/Gesture.hpp>
 
-#include <string>
+#include <etk/String.hpp>
 
 namespace dollar {
 	class GesturePPlus : public dollar::Gesture {
 		public:
 			GesturePPlus();
 		protected:
-			std::vector<vec2> m_enginePoints;
+			etk::Vector<vec2> m_enginePoints;
 			float m_aspectRatio; // original aspect ratio
 		public:
 			// Configure the reference gesture for recognition...
 			void configure(float _distance, bool _keepAspectRatio);
-			const std::vector<vec2>& getEnginePoints() const {
+			const etk::Vector<vec2>& getEnginePoints() const {
 				return m_enginePoints;
 			}
-			const std::vector<std::vector<vec2>>& getPath() const {
+			const etk::Vector<etk::Vector<vec2>>& getPath() const {
 				return m_path;
 			}
-			std::vector<std::vector<vec2>>& getPath() {
+			etk::Vector<etk::Vector<vec2>>& getPath() {
 				return m_path;
 			}
 			const float& getAspectRatio() const {

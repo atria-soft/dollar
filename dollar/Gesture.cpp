@@ -13,9 +13,9 @@
 #include <etk/stdTools.hpp>
 
 
-static std::vector<std::vector<vec2>> loadPointsJson(const ejson::Document& _doc) {
+static etk::Vector<etk::Vector<vec2>> loadPointsJson(const ejson::Document& _doc) {
 	// extract lines:
-	std::vector<std::vector<vec2>> out;
+	etk::Vector<etk::Vector<vec2>> out;
 	const ejson::Array listOfLines = _doc["data"].toArray();
 	if (listOfLines.exist() == false) {
 		DOLLAR_WARNING("Reference element has no element named 'data' " << _doc["data"]);
@@ -23,19 +23,19 @@ static std::vector<std::vector<vec2>> loadPointsJson(const ejson::Document& _doc
 	}
 	for (auto itLines : listOfLines) {
 		ejson::Array listOfpoint = itLines.toArray();
-		std::vector<vec2> line;
+		etk::Vector<vec2> line;
 		for (auto itPoints : listOfpoint) {
 			ejson::Array pointsArray = itPoints.toArray();
-			line.push_back(vec2(pointsArray[0].toNumber().get(), pointsArray[1].toNumber().get()));
+			line.pushBack(vec2(pointsArray[0].toNumber().get(), pointsArray[1].toNumber().get()));
 		}
 		if (line.size() > 1) {
-			out.push_back(std::move(line));
+			out.pushBack(etk::move(line));
 		}
 	}
 	return out;
 }
 
-std::vector<std::vector<vec2>> dollar::loadPoints(const std::string& _fileName, std::string* _label, std::string* _type) {
+etk::Vector<etk::Vector<vec2>> dollar::loadPoints(const etk::String& _fileName, etk::String* _label, std::string* _type) {
 	ejson::Document doc;
 	doc.load(_fileName);
 	if (_label != nullptr) {
@@ -45,17 +45,17 @@ std::vector<std::vector<vec2>> dollar::loadPoints(const std::string& _fileName, 
 		*_type = doc["type"].toString().get();
 	}
 	// extract lines:
-	std::vector<std::vector<vec2>> out;
+	etk::Vector<etk::Vector<vec2>> out;
 	ejson::Array listOfLines = doc["data"].toArray();
 	for (auto itLines : listOfLines) {
 		ejson::Array listOfpoint = itLines.toObject()["list"].toArray();
-		std::vector<vec2> line;
+		etk::Vector<vec2> line;
 		for (auto itPoints : listOfpoint) {
 			ejson::Array pointsArray = itPoints.toArray();
-			line.push_back(vec2(pointsArray[0].toNumber().get(), pointsArray[1].toNumber().get()));
+			line.pushBack(vec2(pointsArray[0].toNumber().get(), pointsArray[1].toNumber().get()));
 		}
 		if (line.size() > 1) {
-			out.push_back(std::move(line));
+			out.pushBack(etk::move(line));
 		}
 	}
 	return out;
@@ -70,8 +70,8 @@ dollar::Gesture::Gesture():
 	
 }
 
-bool dollar::Gesture::load(const std::string& _fileName) {
-	std::string tmpName = etk::tolower(_fileName);
+bool dollar::Gesture::load(const etk::String& _fileName) {
+	etk::String tmpName = etk::tolower(_fileName);
 	if (etk::end_with(tmpName, ".json") == true) {
 		return loadJSON(_fileName);
 	} else if (etk::end_with(tmpName, ".svg") == true) {
@@ -82,7 +82,7 @@ bool dollar::Gesture::load(const std::string& _fileName) {
 	return false;
 }
 
-bool dollar::Gesture::loadJSON(const std::string& _fileName) {
+bool dollar::Gesture::loadJSON(const etk::String& _fileName) {
 	ejson::Document doc;
 	doc.load(_fileName);
 	if (doc["type"].toString().get() != "REFERENCE") {
@@ -96,10 +96,10 @@ bool dollar::Gesture::loadJSON(const std::string& _fileName) {
 	return true;
 }
 
-bool dollar::Gesture::loadSVG(const std::string& _fileName) {
+bool dollar::Gesture::loadSVG(const etk::String& _fileName) {
 	esvg::Document doc;
 	doc.load(_fileName);
-	std::vector<std::string> plop = etk::split(_fileName, '.');
+	etk::Vector<etk::String> plop = etk::split(_fileName, '.');
 	plop = etk::split(plop[plop.size() -2], '/');
 	plop = etk::split(plop[plop.size() -1], '_');
 	m_name = plop[0];
@@ -116,8 +116,8 @@ bool dollar::Gesture::loadSVG(const std::string& _fileName) {
 }
 
 
-bool dollar::Gesture::store(const std::string& _fileName) {
-	std::string tmpName = etk::tolower(_fileName);
+bool dollar::Gesture::store(const etk::String& _fileName) {
+	etk::String tmpName = etk::tolower(_fileName);
 	if (etk::end_with(tmpName, ".json") == true) {
 		storeJSON(_fileName);
 		return true;
@@ -130,7 +130,7 @@ bool dollar::Gesture::store(const std::string& _fileName) {
 	return false;
 }
 
-void dollar::Gesture::storeJSON(const std::string& _fileName) {
+void dollar::Gesture::storeJSON(const etk::String& _fileName) {
 	ejson::Document doc;
 	doc.add("type", ejson::String("REFERENCE"));
 	doc.add("value", ejson::String(m_name));
@@ -151,9 +151,9 @@ void dollar::Gesture::storeJSON(const std::string& _fileName) {
 	doc.store(_fileName);
 }
 
-void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
-	std::vector<std::vector<vec2>> strokes = dollar::scaleToOne(m_path, true);
-	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+void dollar::Gesture::storeSVG(const etk::String& _fileName, bool _storeDot) {
+	etk::Vector<etk::Vector<vec2>> strokes = dollar::scaleToOne(m_path, true);
+	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itLines : strokes) {
 		data += "	<polyline fill=\"none\" stroke=\"black\" stroke-opacity=\"1\" stroke-width=\"2\"\n";
@@ -164,7 +164,7 @@ void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+			data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
@@ -172,7 +172,7 @@ void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
 	if (_storeDot == true) {
 		/*
 		for (auto &it : m_enginePoints) {
-			data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
+			data += "	<circle fill=\"red\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 		}
 		*/
 	}
@@ -180,7 +180,7 @@ void dollar::Gesture::storeSVG(const std::string& _fileName, bool _storeDot) {
 	etk::FSNodeWriteAllData(_fileName, data);
 }
 
-void dollar::Gesture::set(const std::string& _name, uint32_t _subId, std::vector<std::vector<vec2>> _path) {
+void dollar::Gesture::set(const etk::String& _name, uint32_t _subId, etk::Vector<etk::Vector<vec2>> _path) {
 	m_name = _name;
 	m_subId = _subId;
 	m_path = _path;

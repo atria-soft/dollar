@@ -12,7 +12,7 @@
 #include <dollar/GesturePPlus.hpp>
 #include <limits>
 #include <iostream>
-#include <string>
+#include <etk/String.hpp>
 
 namespace dollar {
 	class EnginePPlus : public dollar::Engine {
@@ -47,21 +47,21 @@ namespace dollar {
 			void setPenalityAspectRatio(float _value);
 			float getPenalityAspectRatio();
 		protected:
-			std::vector<ememory::SharedPtr<dollar::GesturePPlus>> m_gestures; //!< List of all loaded gesture in the engine
+			etk::Vector<ememory::SharedPtr<dollar::GesturePPlus>> m_gestures; //!< List of all loaded gesture in the engine
 		public:
 			EnginePPlus();
-			dollar::Results recognize2(const std::vector<std::vector<vec2>>& _paths) override;
-			bool loadGesture(const std::string& _filename) override;
+			dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _paths) override;
+			bool loadGesture(const etk::String& _filename) override;
 			void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) override;
 		protected:
-			float calculatePPlusDistance(const std::vector<vec2>& _points,
-			                             const std::vector<vec2>& _reference,
-			                             std::vector<std::pair<int32_t, int32_t>>& _dataDebug,
+			float calculatePPlusDistance(const etk::Vector<vec2>& _points,
+			                             const etk::Vector<vec2>& _reference,
+			                             etk::Vector<etk::Pair<int32_t, int32_t>>& _dataDebug,
 			                             float _inputAspectRatio,
 			                             float _referenceAspectRatio);
-			float calculatePPlusDistanceSimple(const std::vector<vec2>& _points,
-			                                   const std::vector<vec2>& _reference,
-			                                   std::vector<std::pair<int32_t, int32_t>>& _dataDebug);
+			float calculatePPlusDistanceSimple(const etk::Vector<vec2>& _points,
+			                                   const etk::Vector<vec2>& _reference,
+			                                   etk::Vector<etk::Pair<int32_t, int32_t>>& _dataDebug);
 	};
 }
 

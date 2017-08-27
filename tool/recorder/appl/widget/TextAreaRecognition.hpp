@@ -20,7 +20,7 @@ namespace appl {
 				
 			}
 			enum gale::key::type m_type;
-			std::vector<vec2> m_data;
+			etk::Vector<vec2> m_data;
 			void clear() {
 				m_type = gale::key::type::unknow;
 				m_data.clear();
@@ -31,7 +31,7 @@ namespace appl {
 						return;
 					}
 				}
-				m_data.push_back(_point);
+				m_data.pushBack(_point);
 			}
 	};
 	namespace widget {
@@ -39,18 +39,18 @@ namespace appl {
 			protected:
 				ewol::compositing::Drawing m_draw; //!< drawing instance
 				ewol::compositing::Text m_text; //!< drawing instance
-				std::vector<DrawingLine> m_dataList;
+				etk::Vector<DrawingLine> m_dataList;
 				DrawingLine m_current;
 				std::chrono::system_clock::time_point m_time;
 				std::chrono::system_clock::time_point m_lastEvent;
 				esignal::Connection m_periodicConnection;
 				bool m_updateDone;
-				std::string m_svgData;
+				etk::String m_svgData;
 				int32_t m_detectId;
-				std::string m_compare;
+				etk::String m_compare;
 				ememory::SharedPtr<dollar::Engine> m_dollarEngine;
 				dollar::Results m_dollarResults;
-				std::string m_findValue;
+				etk::String m_findValue;
 				std::chrono::milliseconds m_dollarTime;
 			protected:
 				//! @brief constructor
@@ -63,8 +63,8 @@ namespace appl {
 			public:
 				void clear();
 				void undo();
-				void store(const std::string& _userName, const std::string& _value, const std::string& _type);
-				void setCompare(const std::string& _compare);
+				void store(const etk::String& _userName, const etk::String& _value, const std::string& _type);
+				void setCompare(const etk::String& _compare);
 			public:
 				void onDraw() override;
 				void onRegenerateDisplay() override;

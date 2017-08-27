@@ -19,92 +19,92 @@ appl::Windows::Windows() :
   m_currentTypeId(0),
   m_userName("Edouard DUPIN") {
 	addObjectType("appl::Windows");
-	propertyTitle.setDirectCheck(std::string("sample ") + PROJECT_NAME);
+	propertyTitle.setDirectCheck(etk::String("sample ") + PROJECT_NAME);
 }
 
 void appl::Windows::init() {
 	ewol::widget::Windows::init();
-	m_listType.push_back("hand");
-	m_listType.push_back("print");
+	m_listType.pushBack("hand");
+	m_listType.pushBack("print");
 	m_currentTypeId = 0;
-	std::string tmp;
+	etk::String tmp;
 	for (char iii='0'; iii<='9'; ++iii) {
 		tmp = iii;
-		m_listValue.push_back(tmp);
+		m_listValue.pushBack(tmp);
 	}
 	for (char iii='a'; iii<='z'; ++iii) {
 		tmp = iii;
-		m_listValue.push_back(tmp);
+		m_listValue.pushBack(tmp);
 	}
 	for (char iii='A'; iii<='Z'; ++iii) {
 		tmp = iii;
-		m_listValue.push_back(tmp);
+		m_listValue.pushBack(tmp);
 	}
-	m_listValue.push_back("+");
-	m_listValue.push_back("-");
-	m_listValue.push_back("*");
-	m_listValue.push_back("=");
-	m_listValue.push_back("/");
-	m_listValue.push_back("?");
-	m_listValue.push_back("!");
-	m_listValue.push_back("@");
-	m_listValue.push_back("#");
-	m_listValue.push_back("~");
-	m_listValue.push_back("&");
-	m_listValue.push_back("(");
-	m_listValue.push_back(")");
-	m_listValue.push_back("[");
-	m_listValue.push_back("]");
-	m_listValue.push_back("{");
-	m_listValue.push_back("}");
-	m_listValue.push_back("^");
-	m_listValue.push_back("%");
-	m_listValue.push_back(";");
-	m_listValue.push_back(".");
-	m_listValue.push_back(",");
-	m_listValue.push_back("<");
-	m_listValue.push_back(">");
-	m_listValue.push_back("µ");
-	m_listValue.push_back("$");
-	m_listValue.push_back("\"");
-	m_listValue.push_back("'");
-	m_listValue.push_back("|");
-	m_listValue.push_back("\\");
-	m_listValue.push_back("€");
-	m_listValue.push_back("ù");
-	m_listValue.push_back("é");
-	m_listValue.push_back("è");
-	m_listValue.push_back("ç");
-	m_listValue.push_back("à");
-	m_listValue.push_back("÷");
-	m_listValue.push_back("≠");
-	m_listValue.push_back("≡");
-	m_listValue.push_back("≤");
-	m_listValue.push_back("≥");
-	m_listValue.push_back("∀");
-	m_listValue.push_back("∧");
-	m_listValue.push_back("→");
-	m_listValue.push_back("←");
-	m_listValue.push_back("⇔");
-	m_listValue.push_back("⌊");
-	m_listValue.push_back("⌋");
-	m_listValue.push_back("⌈");
-	m_listValue.push_back("⌉");
-	m_listValue.push_back("∆");
-	m_listValue.push_back("∇");
-	m_listValue.push_back("□");
-	m_listValue.push_back("◊");
-	m_listValue.push_back("⊳");
-	m_listValue.push_back("⊵");
-	m_listValue.push_back("⊲");
-	m_listValue.push_back("⊴");
-	m_listValue.push_back("∃");
-	m_listValue.push_back("∑");
-	m_listValue.push_back("≈");
-	m_listValue.push_back("∝");
-	m_listValue.push_back("∞");
+	m_listValue.pushBack("+");
+	m_listValue.pushBack("-");
+	m_listValue.pushBack("*");
+	m_listValue.pushBack("=");
+	m_listValue.pushBack("/");
+	m_listValue.pushBack("?");
+	m_listValue.pushBack("!");
+	m_listValue.pushBack("@");
+	m_listValue.pushBack("#");
+	m_listValue.pushBack("~");
+	m_listValue.pushBack("&");
+	m_listValue.pushBack("(");
+	m_listValue.pushBack(")");
+	m_listValue.pushBack("[");
+	m_listValue.pushBack("]");
+	m_listValue.pushBack("{");
+	m_listValue.pushBack("}");
+	m_listValue.pushBack("^");
+	m_listValue.pushBack("%");
+	m_listValue.pushBack(";");
+	m_listValue.pushBack(".");
+	m_listValue.pushBack(",");
+	m_listValue.pushBack("<");
+	m_listValue.pushBack(">");
+	m_listValue.pushBack("µ");
+	m_listValue.pushBack("$");
+	m_listValue.pushBack("\"");
+	m_listValue.pushBack("'");
+	m_listValue.pushBack("|");
+	m_listValue.pushBack("\\");
+	m_listValue.pushBack("€");
+	m_listValue.pushBack("ù");
+	m_listValue.pushBack("é");
+	m_listValue.pushBack("è");
+	m_listValue.pushBack("ç");
+	m_listValue.pushBack("à");
+	m_listValue.pushBack("÷");
+	m_listValue.pushBack("≠");
+	m_listValue.pushBack("≡");
+	m_listValue.pushBack("≤");
+	m_listValue.pushBack("≥");
+	m_listValue.pushBack("∀");
+	m_listValue.pushBack("∧");
+	m_listValue.pushBack("→");
+	m_listValue.pushBack("←");
+	m_listValue.pushBack("⇔");
+	m_listValue.pushBack("⌊");
+	m_listValue.pushBack("⌋");
+	m_listValue.pushBack("⌈");
+	m_listValue.pushBack("⌉");
+	m_listValue.pushBack("∆");
+	m_listValue.pushBack("∇");
+	m_listValue.pushBack("□");
+	m_listValue.pushBack("◊");
+	m_listValue.pushBack("⊳");
+	m_listValue.pushBack("⊵");
+	m_listValue.pushBack("⊲");
+	m_listValue.pushBack("⊴");
+	m_listValue.pushBack("∃");
+	m_listValue.pushBack("∑");
+	m_listValue.pushBack("≈");
+	m_listValue.pushBack("∝");
+	m_listValue.pushBack("∞");
 	m_currentId = 0;
-	std::string composition = std::string("");
+	etk::String composition = etk::String("");
 	composition += "<sizer mode='vert'>\n";
 	composition += "	<spacer min-size='4%'/>\n";
 	composition += "	<sizer mode='hori' lock='false,true' min-size='9%'>\n";
@@ -183,7 +183,7 @@ void appl::Windows::init() {
 	}
 }
 
-void appl::Windows::onCallbackChangeNameUser(const std::string& _value) {
+void appl::Windows::onCallbackChangeNameUser(const etk::String& _value) {
 	m_userName = _value;
 }
 

@@ -12,7 +12,7 @@
 #include <dollar/GestureP.hpp>
 #include <limits>
 #include <iostream>
-#include <string>
+#include <etk/String.hpp>
 
 namespace dollar {
 	class EngineP : public dollar::Engine {
@@ -27,11 +27,11 @@ namespace dollar {
 			void setNumberPointInGesture(size_t _value);
 			size_t getNumberPointInGesture();
 		protected:
-			std::vector<ememory::SharedPtr<dollar::GestureP>> m_gestures; //!< List of all loaded gesture in the engine
+			etk::Vector<ememory::SharedPtr<dollar::GestureP>> m_gestures; //!< List of all loaded gesture in the engine
 		public:
 			EngineP();
-			dollar::Results recognize2(const std::vector<std::vector<vec2>>& _paths) override;
-			bool loadGesture(const std::string& _filename) override;
+			dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _paths) override;
+			bool loadGesture(const etk::String& _filename) override;
 			void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) override;
 	};
 }

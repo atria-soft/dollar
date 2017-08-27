@@ -24,16 +24,16 @@ void dollar::GestureN::configure(float _startAngleIndex, size_t _nbSample, bool 
 	m_engineStartV.clear();
 	m_path2 = dollar::scaleToOne(m_path, _keepAspectRatio);
 	// for debug only
-	//storeSVG("out_dollar/lib/gestures/" + m_name + "_" + etk::to_string(m_subId) + ".svg", true);
+	//storeSVG("out_dollar/lib/gestures/" + m_name + "_" + etk::toString(m_subId) + ".svg", true);
 	// Simplyfy paths
-	std::vector<std::vector<vec2>> uniPath = dollar::makeReferenceStrokes(m_path);
+	etk::Vector<etk::Vector<vec2>> uniPath = dollar::makeReferenceStrokes(m_path);
 	// normalize paths
 	for (auto &it : uniPath) {
-		std::vector<vec2> val = dollar::normalizePath(it, _nbSample, _ignoreRotation, _keepAspectRatio);
-		m_enginePath.push_back(val);
+		etk::Vector<vec2> val = dollar::normalizePath(it, _nbSample, _ignoreRotation, _keepAspectRatio);
+		m_enginePath.pushBack(val);
 		// calculate start vector:
 		vec2 startv = dollar::getStartVector(val, _startAngleIndex);
-		m_engineStartV.push_back(startv);
-		m_engineVector.push_back(dollar::normalyse(val));
+		m_engineStartV.pushBack(startv);
+		m_engineVector.pushBack(dollar::normalyse(val));
 	}
 }

@@ -20,7 +20,7 @@ size_t dollar::Results::getSize() const {
 	return m_values.size();
 }
 
-std::string dollar::Results::getName(size_t _id) const {
+etk::String dollar::Results::getName(size_t _id) const {
 	if (_id >= m_values.size()) {
 		DOLLAR_ERROR("request acces error result out of range (name)");
 		return "";
@@ -36,8 +36,8 @@ float dollar::Results::getConfidence(size_t _id) const {
 	return m_values[_id].confidence;
 }
 
-void dollar::Results::addValue(const std::string& _name, float _confidence) {
-	m_values.push_back(ResultData(_name, _confidence));
+void dollar::Results::addValue(const etk::String& _name, float _confidence) {
+	m_values.pushBack(ResultData(_name, _confidence));
 }
 
 

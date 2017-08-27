@@ -57,8 +57,8 @@ bool dollar::EngineP::getScaleKeepRatio() {
 	return m_scaleKeepRatio;
 }
 
-static float cloudDistance(const std::vector<vec2>& _points1, const std::vector<vec2>& _points2, size_t _start) {
-	std::vector<bool> matched;
+static float cloudDistance(const etk::Vector<vec2>& _points1, const etk::Vector<vec2>& _points2, size_t _start) {
+	etk::Vector<bool> matched;
 	matched.resize(_points1.size(), false);
 	float out = 0;
 	size_t iii = _start;
@@ -84,7 +84,7 @@ static float cloudDistance(const std::vector<vec2>& _points1, const std::vector<
 }
 
 //Greedy-Cloud-Match
-static float calculateBestDistance(const std::vector<vec2>& _points, const std::vector<vec2>& _reference) {
+static float calculateBestDistance(const etk::Vector<vec2>& _points, const etk::Vector<vec2>& _reference) {
 	float out = MAX_FLOAT;
 	float si = 0.5f;
 	float step = pow(_points.size(), si-1);
@@ -95,13 +95,13 @@ static float calculateBestDistance(const std::vector<vec2>& _points, const std::
 	for (size_t iii=0; iii<_points.size(); iii+=int32_t(step)) {
 		float d1 = cloudDistance(_points, _reference, iii);
 		float d2 = cloudDistance(_reference, _points, iii);
-		out = std::min(out, std::min(d1,d2));
+		out = etk::min(out, etk::min(d1,d2));
 	}
 	return out;	// Distance to the nearest point must be < 2.0 (maximum distance visible)
 }
 
 
-bool dollar::EngineP::loadGesture(const std::string& _filename) {
+bool dollar::EngineP::loadGesture(const etk::String& _filename) {
 	ememory::SharedPtr<dollar::Gesture> ref = ememory::makeShared<dollar::GestureP>();
 	DOLLAR_DEBUG("Load Gesture: " << _filename);
 	if (ref->load(_filename) == true) {
@@ -115,12 +115,12 @@ void dollar::EngineP::addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) {
 	ememory::SharedPtr<dollar::GestureP> gest = ememory::dynamicPointerCast<dollar::GestureP>(_gesture);
 	if (gest != nullptr) {
 		gest->configure(m_numPointsInGesture);
-		m_gestures.push_back(gest);
+		m_gestures.pushBack(gest);
 	}
 }
 
-dollar::Results dollar::EngineP::recognize2(const std::vector<std::vector<vec2>>& _strokes) {
-	std::vector<vec2> points = dollar::combineStrokes(_strokes);
+dollar::Results dollar::EngineP::recognize2(const etk::Vector<etk::Vector<vec2>>& _strokes) {
+	etk::Vector<vec2> points = dollar::combineStrokes(_strokes);
 	points = dollar::normalizePath(points, m_numPointsInGesture, false, m_scaleKeepRatio);
 	// Keep maximum 5 results ...
 	float bestDistance[m_nbResult];
@@ -168,7 +168,7 @@ dollar::Results dollar::EngineP::recognize2(const std::vector<std::vector<vec2>>
 	Results res;
 	for (size_t iii=0; iii<m_nbResult; ++iii) {
 		if (-1 != indexOfBestMatch[iii]) {
-			//float score = std::max((2.0 - bestDistance[iii])/2.0, 0.0);
+			//float score = etk::max((2.0 - bestDistance[iii])/2.0, 0.0);
 			float score = bestDistance[iii];
 			res.addValue(m_gestures[indexOfBestMatch[iii]]->getName(), score);
 		}

@@ -28,10 +28,10 @@ size_t dollar::Engine::getNumberResult() {
 }
 
 
-bool dollar::Engine::loadPath(const std::string& _path) {
+bool dollar::Engine::loadPath(const etk::String& _path) {
 	DOLLAR_INFO("Load Path: " << _path);
 	etk::FSNode path(_path);
-	std::vector<std::string> files = path.folderGetSub(false, true, "*.json");
+	etk::Vector<etk::String> files = path.folderGetSub(false, true, "*.json");
 	for (auto &it : files) {
 		if (etk::end_with(it, ".json") == true) {
 			loadGesture(it);
@@ -41,16 +41,16 @@ bool dollar::Engine::loadPath(const std::string& _path) {
 }
 
 
-dollar::Results dollar::Engine::recognize(const std::vector<vec2>& _points) {
-	std::vector<std::vector<vec2>> tmp;
-	tmp.push_back(_points);
+dollar::Results dollar::Engine::recognize(const etk::Vector<vec2>& _points) {
+	etk::Vector<etk::Vector<vec2>> tmp;
+	tmp.pushBack(_points);
 	return recognize2(tmp);
 }
-dollar::Results dollar::Engine::recognize(const std::vector<std::vector<vec2>>& _points) {
+dollar::Results dollar::Engine::recognize(const etk::Vector<etk::Vector<vec2>>& _points) {
 	return recognize2(_points);
 }
 
-ememory::SharedPtr<dollar::Engine> dollar::createEngine(const std::string& _method) {
+ememory::SharedPtr<dollar::Engine> dollar::createEngine(const etk::String& _method) {
 	if (    _method == "$N"
 	     || _method == "$1") {
 		return ememory::makeShared<dollar::EngineN>(false);

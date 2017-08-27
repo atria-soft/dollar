@@ -11,7 +11,7 @@
 #include <etk/etk.hpp>
 #include <test-debug/debug.hpp>
 #include <etk/os/FSNode.hpp>
-#include <map>
+#include <etk/Map.hpp>
 
 static bool keepAspectRatio = false;
 static float distanceReference = 0.1f; // distance of the gesture reference [0.02, 0.3]
@@ -20,32 +20,32 @@ static float penalityRef = 0.1;
 static float penalitySample = 0.1;
 static float penalityAspectRatio = 0.2; //!< ==> result += delta aspect ratio * penality
 
-void usage(const std::string& _progName) {
+void usage(const etk::String& _progName) {
 	TEST_PRINT("usage:");
 	TEST_PRINT("    " << _progName << " [option] reference_gesture corpus_path");
 	TEST_PRINT("        [option]");
 	TEST_PRINT("            -h --help             Display this help");
-	TEST_PRINT("            --keep_ratio                 Keep aspect ratio for the form recognition (default:" + etk::to_string(keepAspectRatio) + ")");
-	TEST_PRINT("            --dist-check=flaot           Distance between points in the system recognition (default:" + etk::to_string(distanceReference) + ")");
-	TEST_PRINT("            --dist-excl=flaot            Distance to exclude a point in a pathern matching ... (default:" + etk::to_string(distanceExclude) + ")");
-	TEST_PRINT("            --penal-ref=float            Penality for reference when not connected (default:" + etk::to_string(penalityRef) + ")");
-	TEST_PRINT("            --penal-sample=float         Penality for sample when not connected (default:" + etk::to_string(penalitySample) + ")");
-	TEST_PRINT("            --penal-aspect-ratio=float   Penality for the distance of aspect ratio (default:" + etk::to_string(penalityAspectRatio) + ")");
+	TEST_PRINT("            --keep_ratio                 Keep aspect ratio for the form recognition (default:" + etk::toString(keepAspectRatio) + ")");
+	TEST_PRINT("            --dist-check=flaot           Distance between points in the system recognition (default:" + etk::toString(distanceReference) + ")");
+	TEST_PRINT("            --dist-excl=flaot            Distance to exclude a point in a pathern matching ... (default:" + etk::toString(distanceExclude) + ")");
+	TEST_PRINT("            --penal-ref=float            Penality for reference when not connected (default:" + etk::toString(penalityRef) + ")");
+	TEST_PRINT("            --penal-sample=float         Penality for sample when not connected (default:" + etk::toString(penalitySample) + ")");
+	TEST_PRINT("            --penal-aspect-ratio=float   Penality for the distance of aspect ratio (default:" + etk::toString(penalityAspectRatio) + ")");
 	TEST_PRINT("        parameters (must be here)");
 	TEST_PRINT("            reference_gesture   Path of the reference gestures");
 	TEST_PRINT("            corpus_path         Path of the corpus files");
 }
 
-bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus);
+bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus);
 
 
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
-	std::string srcGesture;
-	std::string srcCorpus;
+	etk::String srcGesture;
+	etk::String srcCorpus;
 	for (int32_t iii=1; iii<_argc; ++iii) {
-		std::string arg = _argv[iii];
+		etk::String arg = _argv[iii];
 		if (    arg == "-h"
 		     || arg == "--help") {
 			usage(_argv[0]);
@@ -56,31 +56,31 @@ int main(int _argc, const char *_argv[]) {
 			continue;
 		}
 		if (etk::start_with(arg,"--dist-ref=") == true) {
-			std::string val(&arg[11]);
+			etk::String val(&arg[11]);
 			distanceReference = etk::string_to_float(val);
 			TEST_PRINT("configure distanceReference=" << distanceReference);
 			continue;
 		}
 		if (etk::start_with(arg,"--dist-excl=") == true) {
-			std::string val(&arg[12]);
+			etk::String val(&arg[12]);
 			distanceExclude = etk::string_to_float(val);
 			TEST_PRINT("configure distanceExclude=" << distanceExclude);
 			continue;
 		}
 		if (etk::start_with(arg,"--penal-ref=") == true) {
-			std::string val(&arg[12]);
+			etk::String val(&arg[12]);
 			penalityRef = etk::string_to_float(val);
 			TEST_PRINT("configure penalityRef=" << penalityRef);
 			continue;
 		}
 		if (etk::start_with(arg,"--penal-sample=") == true) {
-			std::string val(&arg[15]);
+			etk::String val(&arg[15]);
 			penalityRef = etk::string_to_float(val);
 			TEST_PRINT("configure penalitySample=" << penalitySample);
 			continue;
 		}
 		if (etk::start_with(arg,"--penal-aspect-ratio=") == true) {
-			std::string val(&arg[20]);
+			etk::String val(&arg[20]);
 			penalityAspectRatio = etk::string_to_float(val);
 			TEST_PRINT("configure penalityAspectRatio=" << penalityAspectRatio);
 			continue;
@@ -110,11 +110,11 @@ int main(int _argc, const char *_argv[]) {
 	return testCorpus(srcGesture, srcCorpus);
 }
 
-void generateFile(const std::string& _fileName, const std::vector<std::string>& _list) {
-	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& _list) {
+	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itFile : _list) {
-		std::vector<std::vector<vec2>> strokes = dollar::scaleToOne(dollar::loadPoints(itFile));
+		etk::Vector<etk::Vector<vec2>> strokes = dollar::scaleToOne(dollar::loadPoints(itFile));
 		for (auto &itLines : strokes) {
 			data += "	<polyline fill=\"none\" stroke=\"black\" stroke-opacity=\"0.5\" stroke-width=\"1\"\n";
 			data += "	          points=\"";
@@ -124,7 +124,7 @@ void generateFile(const std::string& _fileName, const std::vector<std::string>& 
 					data += " ";
 				}
 				first = false;
-				data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+				data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 			}
 			data += "\"\n";
 			data += "	          />\n";
@@ -134,26 +134,26 @@ void generateFile(const std::string& _fileName, const std::vector<std::string>& 
 	etk::FSNodeWriteAllData(_fileName, data);
 }
 
-void annalyseResult(std::map<std::string, std::vector<std::pair<dollar::Results, std::string>>>& _result) {
+void annalyseResult(etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results, etk::String>>>& _result) {
 	TEST_PRINT("Full results:");
 	for (auto &it : _result) {
 		int32_t nbRecognise = 0;
 		int32_t nbtested = 0;
-		std::string label = etk::split(it.first, ' ')[0];
-		std::string type;
+		etk::String label = etk::split(it.first, ' ')[0];
+		etk::String type;
 		if (etk::split(it.first, ' ').size() > 1) {
 			type = etk::split(it.first, ' ')[1];
 		}
-		std::vector<std::string> listFull;
-		std::vector<std::string> listWrong;
-		std::map<std::string, int32_t> wrongValues;
+		etk::Vector<etk::String> listFull;
+		etk::Vector<etk::String> listWrong;
+		etk::Map<etk::String, int32_t> wrongValues;
 		for (auto itRes : it.second) {
 			nbtested ++;
-			listFull.push_back(itRes.second);
+			listFull.pushBack(itRes.second);
 			if (label == itRes.first.getName()) {
 				nbRecognise++;
 			} else {
-				listWrong.push_back(itRes.second);
+				listWrong.pushBack(itRes.second);
 				if (wrongValues.find(itRes.first.getName()) != wrongValues.end()) {
 					wrongValues[itRes.first.getName()]++;
 				} else {
@@ -183,7 +183,7 @@ void annalyseResult(std::map<std::string, std::vector<std::pair<dollar::Results,
 	}
 }
 
-bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
+bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus) {
 	// declare a Gesture (internal API)
 	dollar::EnginePPlus reco;
 	reco.setScaleKeepRatio(keepAspectRatio);
@@ -202,31 +202,31 @@ bool testCorpus(const std::string& _srcGesture, const std::string& _srcCorpus) {
 	}
 	TEST_DEBUG("List all file in the corpus path");
 	etk::FSNode path(_srcCorpus);
-	std::vector<std::string> files = path.folderGetSub(false, true, "*.json");
+	etk::Vector<etk::String> files = path.folderGetSub(false, true, "*.json");
 	TEST_PRINT("---------------------------------------------------------------------------");
 	TEST_PRINT("-- test gestures: ");
 	TEST_PRINT("---------------------------------------------------------------------------");
 	
 	// "label_type" ==> list of (result, file test name)
-	std::map<std::string, std::vector<std::pair<dollar::Results, std::string>>> agregateResults;
+	etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results, etk::String>>> agregateResults;
 	int32_t nbRecognise = 0;
 	int32_t nbRecognise2 = 0;
 	int32_t nbtested = 0;
 	for (auto &it : files) {
-		std::string label;
-		std::string type;
-		std::vector<std::vector<vec2>> listPoints = dollar::loadPoints(it, &label, &type);
+		etk::String label;
+		etk::String type;
+		etk::Vector<etk::Vector<vec2>> listPoints = dollar::loadPoints(it, &label, &type);
 		if (type == "hand") {
 			//continue; // rejest for now ...
 		}
 		nbtested++;
-		std::vector<std::string> path = etk::split(it, '/');
-		std::string filename = path[path.size()-1];
+		etk::Vector<etk::String> path = etk::split(it, '/');
+		etk::String filename = path[path.size()-1];
 		TEST_PRINT("Test '" << label << "' type=" << type << "       " << filename);
 		dollar::Results res = reco.recognize(listPoints);
 		
-		//agregateResults[label+" "+type].push_back(std::make_pair(res,it));
-		agregateResults[label].push_back(std::make_pair(res,it));
+		//agregateResults[label+" "+type].pushBack(etk::makePair(res,it));
+		agregateResults[label].pushBack(etk::makePair(res,it));
 		
 		if (res.haveMatch() == false) {
 			TEST_INFO("   Recognise noting ...");

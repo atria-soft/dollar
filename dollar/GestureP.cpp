@@ -20,6 +20,6 @@ dollar::GestureP::GestureP() {
 void dollar::GestureP::configure(size_t _nbSample) {
 	m_enginePoints.clear();
 	// Generates dots:
-	std::vector<vec2> points = dollar::combineStrokes(m_path);
+	etk::Vector<vec2> points = dollar::combineStrokes(m_path);
 	m_enginePoints = dollar::normalizePath(points, _nbSample, false, false);
 }

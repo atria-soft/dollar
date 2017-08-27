@@ -6,14 +6,14 @@
 #pragma once
 
 #include <cmath>
-#include <string>
+#include <etk/String.hpp>
 #include <list>
-#include <vector>
+#include <etk/Vector.hpp>
 
 namespace dollar {
 	class ResultData {
 		public:
-			std::string value;
+			etk::String value;
 			float confidence;
 			#ifdef DOLLAR_ANNALYSER_ENABLE
 				float distance;
@@ -22,7 +22,7 @@ namespace dollar {
 				int32_t deltaDots; //!< number of dots in delta if > 0 ==> more dots in the reference
 			#endif
 		public:
-			ResultData(const std::string& _value, float _confidence):
+			ResultData(const etk::String& _value, float _confidence):
 			  value(_value),
 			  confidence(_confidence) {
 				
@@ -30,14 +30,14 @@ namespace dollar {
 	};
 	class Results {
 		protected:
-			std::vector<ResultData> m_values;
+			etk::Vector<ResultData> m_values;
 		public:
 			Results();
 			bool haveMatch() const;
 			size_t getSize() const;
-			std::string getName(size_t _id=0) const;
+			etk::String getName(size_t _id=0) const;
 			float getConfidence(size_t _id=0) const;
-			void addValue(const std::string& _name, float _confidence);
+			void addValue(const etk::String& _name, float _confidence);
 			void clear();
 	};
 }

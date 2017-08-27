@@ -13,7 +13,7 @@ dollar::Rectangle::Rectangle(const vec2& _pos, const vec2& _size):
   m_size(_size) {
 	
 }
-dollar::Rectangle::Rectangle(const std::vector<vec2>& _points) {
+dollar::Rectangle::Rectangle(const etk::Vector<vec2>& _points) {
 	vec2 minPos(MAX_FLOAT,MAX_FLOAT);
 	vec2 maxPos(-MAX_FLOAT,-MAX_FLOAT);
 	for (auto &it : _points) {
@@ -23,7 +23,7 @@ dollar::Rectangle::Rectangle(const std::vector<vec2>& _points) {
 	m_pos = minPos;
 	m_size = maxPos-minPos;
 }
-dollar::Rectangle::Rectangle(const std::vector<std::vector<vec2>>& _points) {
+dollar::Rectangle::Rectangle(const etk::Vector<etk::Vector<vec2>>& _points) {
 	vec2 minPos(MAX_FLOAT,MAX_FLOAT);
 	vec2 maxPos(-MAX_FLOAT,-MAX_FLOAT);
 	for (auto &it : _points) {

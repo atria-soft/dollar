@@ -51,11 +51,11 @@ void appl::widget::TextAreaRecognition::undo() {
 	markToRedraw();
 }
 
-void appl::widget::TextAreaRecognition::setCompare(const std::string& _compare) {
+void appl::widget::TextAreaRecognition::setCompare(const etk::String& _compare) {
 	m_compare = _compare;
 }
 
-void appl::widget::TextAreaRecognition::store(const std::string& _userName, const std::string& _value, const std::string& _type) {
+void appl::widget::TextAreaRecognition::store(const etk::String& _userName, const etk::String& _value, const std::string& _type) {
 	if (m_dataList.size() == 0) {
 		return;
 	}
@@ -69,7 +69,7 @@ void appl::widget::TextAreaRecognition::store(const std::string& _userName, cons
 	doc.add("data", list);
 	for (auto &it : m_dataList) {
 		ejson::Object obj;
-		obj.add("type", ejson::String(etk::to_string(it.m_type)));
+		obj.add("type", ejson::String(etk::toString(it.m_type)));
 		ejson::Array listPoint;
 		obj.add("list", listPoint);
 		for (size_t iii=0; iii<it.m_data.size(); ++iii) {
@@ -80,8 +80,8 @@ void appl::widget::TextAreaRecognition::store(const std::string& _userName, cons
 		}
 		list.add(obj);
 	}
-	std::string streamOut = doc.generateMachineString();
-	std::string fileName;
+	etk::String streamOut = doc.generateMachineString();
+	etk::String fileName;
 	fileName = "HOME:DOLLAR/corpus/";
 	if (_value == "/") {
 		fileName += "slash";
@@ -95,7 +95,7 @@ void appl::widget::TextAreaRecognition::store(const std::string& _userName, cons
 	fileName += "_";
 	fileName += _userName;
 	fileName += "_";
-	fileName += etk::to_string(m_time.time_since_epoch().count());
+	fileName += etk::toString(m_time.time_since_epoch().count());
 	fileName += ".json";
 	etk::FSNodeWriteAllData(fileName, streamOut);
 	APPL_WARNING("store: " << fileName);
@@ -106,7 +106,7 @@ void appl::widget::TextAreaRecognition::onDraw() {
 	m_text.draw();
 }
 
-std::vector<std::vector<vec2>> scalePoints(std::vector<std::vector<vec2>> _list, float _objectSize) {
+etk::Vector<etk::Vector<vec2>> scalePoints(std::vector<std::vector<vec2>> _list, float _objectSize) {
 	// get min/max point
 	vec2 minPos(99999999,99999999);
 	vec2 maxPos(0,0);
@@ -137,11 +137,11 @@ std::vector<std::vector<vec2>> scalePoints(std::vector<std::vector<vec2>> _list,
 	return _list;
 }
 
-std::vector<etk::Color<float,4>> renderWithSVG(const std::vector<std::vector<vec2>>& _list, int32_t _objectSize, const std::string& _filename) {
+etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<std::vector<vec2>>& _list, int32_t _objectSize, const etk::String& _filename) {
 	// generate SVG to render:
 	esvg::Document docSvg;
-	std::string data("<?xml version='1.0' encoding='UTF-8' standalone='no'?>\n");
-	data += "<svg height='" + etk::to_string(_objectSize) + "' width='" + etk::to_string(_objectSize) + "'>\n";
+	etk::String data("<?xml version='1.0' encoding='UTF-8' standalone='no'?>\n");
+	data += "<svg height='" + etk::toString(_objectSize) + "' width='" + etk::to_string(_objectSize) + "'>\n";
 	for (auto &itLines : _list) {
 		data += "	<polyline\n";
 		data += "	          fill='none'\n";
@@ -155,7 +155,7 @@ std::vector<etk::Color<float,4>> renderWithSVG(const std::vector<std::vector<vec
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()) + "," + etk::to_string(itPoints.y());
+			data += etk::toString(itPoints.x()) + "," + etk::to_string(itPoints.y());
 		}
 		data += "'\n";
 		data += "	          />\n";
@@ -290,11 +290,11 @@ void appl::widget::TextAreaRecognition::onRegenerateDisplay() {
 			} else {
 				m_text.setColor(etk::color::red);
 			}
-			m_text.print(m_dollarResults.getName(iii) + " " + etk::to_string(m_dollarResults.getConfidence(iii)) + "%");
+			m_text.print(m_dollarResults.getName(iii) + " " + etk::toString(m_dollarResults.getConfidence(iii)) + "%");
 		}
 		m_text.setColor(etk::color::white);
 		m_text.setPos(vec2(0, m_text.getHeight()*2));
-		m_text.print("Dollar=" + etk::to_string(m_dollarTime.count()) + " ms");
+		m_text.print("Dollar=" + etk::toString(m_dollarTime.count()) + " ms");
 	}
 }
 
@@ -313,7 +313,7 @@ bool appl::widget::TextAreaRecognition::onEventInput(const ewol::event::Input& _
 		}
 		if(_event.getStatus() == gale::key::status::up) {
 			m_current.addPoint(relativePosition(_event.getPos()));
-			m_dataList.push_back(m_current);
+			m_dataList.pushBack(m_current);
 			m_current.clear();
 		}
 		if(_event.getStatus() == gale::key::status::move) {
@@ -329,11 +329,11 @@ bool appl::widget::TextAreaRecognition::onEventInput(const ewol::event::Input& _
 	return false;
 }
 
-static std::vector<std::vector<vec2>> convertInLines(const std::vector<appl::DrawingLine>& _list) {
-	std::vector<std::vector<vec2>> out;
+static etk::Vector<etk::Vector<vec2>> convertInLines(const std::vector<appl::DrawingLine>& _list) {
+	etk::Vector<etk::Vector<vec2>> out;
 	for (auto &it : _list) {
 		if (it.m_data.size() > 1) {
-			out.push_back(it.m_data);
+			out.pushBack(it.m_data);
 		} else {
 			// TODO
 		}
@@ -356,7 +356,7 @@ void appl::widget::TextAreaRecognition::callbackPeriodicUpdate(const ewol::event
 			return;
 		}
 		// extract lines from json file:
-		std::vector<std::vector<vec2>> fullListlines = convertInLines(m_dataList);
+		etk::Vector<etk::Vector<vec2>> fullListlines = convertInLines(m_dataList);
 		if (fullListlines.size() == 0) {
 			APPL_ERROR(" can not manage an objest with no line ...");
 			return;

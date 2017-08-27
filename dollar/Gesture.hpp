@@ -8,15 +8,15 @@
 #include <etk/math/Vector2D.hpp>
 #include <ememory/memory.hpp>
 
-#include <string>
+#include <etk/String.hpp>
 
 namespace dollar {
 	class Gesture {
 		protected:
-			std::string m_name;
+			etk::String m_name;
 			uint32_t m_subId;
 			float m_aspectRatio;
-			std::vector<std::vector<vec2>> m_path;
+			etk::Vector<etk::Vector<vec2>> m_path;
 		public:
 			Gesture();
 			virtual ~Gesture() = default;
@@ -26,16 +26,16 @@ namespace dollar {
 			float getKeepAspectRatio() {
 				return m_aspectRatio;
 			}
-			bool load(const std::string& _filename);
-			bool store(const std::string& _filename);
-			void set(const std::string& _name, uint32_t _subId, std::vector<std::vector<vec2>> _path);
+			bool load(const etk::String& _filename);
+			bool store(const etk::String& _filename);
+			void set(const etk::String& _name, uint32_t _subId, etk::Vector<etk::Vector<vec2>> _path);
 		protected:
-			bool loadJSON(const std::string& _filename);
-			bool loadSVG(const std::string& _filename);
-			void storeJSON(const std::string& _filename);
-			void storeSVG(const std::string& _filename, bool _storeDot=false);
+			bool loadJSON(const etk::String& _filename);
+			bool loadSVG(const etk::String& _filename);
+			void storeJSON(const etk::String& _filename);
+			void storeSVG(const etk::String& _filename, bool _storeDot=false);
 		public:
-			const std::string& getName() {
+			const etk::String& getName() {
 				return m_name;
 			}
 			const uint32_t& getId() {
@@ -46,5 +46,5 @@ namespace dollar {
 	 * @brief Load all point from a specific file
 	 *
 	 */
-	std::vector<std::vector<vec2>> loadPoints(const std::string& _fileName, std::string* _label=nullptr, std::string* _type=nullptr);
+	etk::Vector<etk::Vector<vec2>> loadPoints(const etk::String& _fileName, etk::String* _label=nullptr, std::string* _type=nullptr);
 }

@@ -7,9 +7,9 @@
 
 #include <etk/math/Vector2D.hpp>
 #include <cmath>
-#include <string>
+#include <etk/String.hpp>
 #include <list>
-#include <vector>
+#include <etk/Vector.hpp>
 
 namespace dollar {
 	/**
@@ -24,12 +24,12 @@ namespace dollar {
 			 * @brief Create a rectangle as a bounding box
 			 * @param[in] _points List of point that is contained in this area
 			 */
-			Rectangle(const std::vector<vec2>& _points);
+			Rectangle(const etk::Vector<vec2>& _points);
 			/**
 			 * @brief Create a rectangle as a bounding box
 			 * @param[in] _points List of point that is contained in this area
 			 */
-			Rectangle(const std::vector<std::vector<vec2>>& _points);
+			Rectangle(const etk::Vector<etk::Vector<vec2>>& _points);
 			/**
 			 * @brief Create a rectangle with values
 			 * @param[in] _pos Start position

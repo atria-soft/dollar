@@ -13,7 +13,7 @@
 #include <dollar/GestureN.hpp>
 #include <limits>
 #include <iostream>
-#include <string>
+#include <etk/String.hpp>
 
 namespace dollar {
 	class EngineN : public dollar::Engine {
@@ -30,15 +30,15 @@ namespace dollar {
 			void setNumberPointInGesture(size_t _value);
 			size_t getNumberPointInGesture();
 		protected:
-			std::vector<ememory::SharedPtr<dollar::GestureN>> m_gestures; //!< List of all loaded gesture in the engine
+			etk::Vector<ememory::SharedPtr<dollar::GestureN>> m_gestures; //!< List of all loaded gesture in the engine
 		public:
 			EngineN(bool _protractor);
-			dollar::Results recognize2(const std::vector<std::vector<vec2>>& _points) override;
-			bool loadGesture(const std::string& _filename) override;
+			dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _points) override;
+			bool loadGesture(const etk::String& _filename) override;
 			void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) override;
 		protected:
-			float distanceAtBestAngle(const std::vector<vec2>& _points, const std::vector<vec2>& _reference);
-			float optimalCosineDistance(const std::vector<vec2>& _vect1, const std::vector<vec2>& _vect2);
+			float distanceAtBestAngle(const etk::Vector<vec2>& _points, const etk::Vector<vec2>& _reference);
+			float optimalCosineDistance(const etk::Vector<vec2>& _vect1, const etk::Vector<vec2>& _vect2);
 	};
 }
 

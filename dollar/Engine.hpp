@@ -12,7 +12,7 @@
 #include <ememory/memory.hpp>
 #include <limits>
 #include <iostream>
-#include <string>
+#include <etk/String.hpp>
 
 /**
  * @brief dollar library main namespace
@@ -27,17 +27,17 @@ namespace dollar {
 		public:
 			Engine();
 			virtual ~Engine() = default;
-			dollar::Results recognize(const std::vector<vec2>& _paths);
-			dollar::Results recognize(const std::vector<std::vector<vec2>>& _paths);
+			dollar::Results recognize(const etk::Vector<vec2>& _paths);
+			dollar::Results recognize(const etk::Vector<etk::Vector<vec2>>& _paths);
 		protected:
-			virtual dollar::Results recognize2(const std::vector<std::vector<vec2>>& _paths) = 0;
+			virtual dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _paths) = 0;
 		public:
-			virtual bool loadPath(const std::string& _path);
-			virtual bool loadGesture(const std::string& _filename) = 0;
+			virtual bool loadPath(const etk::String& _path);
+			virtual bool loadGesture(const etk::String& _filename) = 0;
 			virtual void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) = 0;
 	};
 	
-	ememory::SharedPtr<dollar::Engine> createEngine(const std::string& _method="$N");
+	ememory::SharedPtr<dollar::Engine> createEngine(const etk::String& _method="$N");
 }
 
 

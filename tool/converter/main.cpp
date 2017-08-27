@@ -10,7 +10,7 @@
 #include <etk/etk.hpp>
 #include <test-debug/debug.hpp>
 
-void usage(const std::string& _progName) {
+void usage(const etk::String& _progName) {
 	TEST_PRINT("usage:");
 	TEST_PRINT("    " << _progName << " [option] source destination");
 	TEST_PRINT("        [option]");
@@ -23,10 +23,10 @@ void usage(const std::string& _progName) {
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
-	std::string src;
-	std::string dst;
+	etk::String src;
+	etk::String dst;
 	for (int32_t iii=1; iii<_argc; ++iii) {
-		std::string arg = _argv[iii];
+		etk::String arg = _argv[iii];
 		if (    arg == "-h"
 		     || arg == "--help") {
 			usage(_argv[0]);

@@ -15,18 +15,18 @@ namespace appl {
 	class Windows : public ewol::widget::Windows {
 		private:
 			ewol::widget::ComposerShared m_composer;
-			std::vector<std::string> m_listValue;
+			etk::Vector<etk::String> m_listValue;
 			size_t m_currentId;
-			std::vector<std::string> m_listType;
+			etk::Vector<etk::String> m_listType;
 			size_t m_currentTypeId;
-			std::string m_userName;
+			etk::String m_userName;
 		protected:
 			Windows();
 			void init();
 		public:
 			DECLARE_FACTORY(Windows);
 		public: // callback functions
-			void onCallbackChangeNameUser(const std::string& _value);
+			void onCallbackChangeNameUser(const etk::String& _value);
 			void onCallbackClear();
 			void onCallbackUndo();
 			void onCallbackStore();

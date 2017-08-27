@@ -94,13 +94,13 @@ float dollar::EnginePPlus::getPenalityAspectRatio() {
 }
 
 
-float dollar::EnginePPlus::calculatePPlusDistanceSimple(const std::vector<vec2>& _points,
-                                                        const std::vector<vec2>& _reference,
-                                                        std::vector<std::pair<int32_t, int32_t>>& _dataDebug) {
-	std::vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
+float dollar::EnginePPlus::calculatePPlusDistanceSimple(const etk::Vector<vec2>& _points,
+                                                        const etk::Vector<vec2>& _reference,
+                                                        etk::Vector<etk::Pair<int32_t, int32_t>>& _dataDebug) {
+	etk::Vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
 	distance.resize(_points.size(), MAX_FLOAT);
 	// point Id that is link on the reference.
-	std::vector<int32_t> usedId;
+	etk::Vector<int32_t> usedId;
 	usedId.resize(_points.size(), -1);
 	for (size_t iii=0; iii<_points.size(); iii++) {
 		float bestDistance = MAX_FLOAT;
@@ -144,7 +144,7 @@ float dollar::EnginePPlus::calculatePPlusDistanceSimple(const std::vector<vec2>&
 	
 	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {
 		if (usedId[kkk] != -1) {
-			_dataDebug.push_back(std::make_pair(kkk, usedId[kkk]));
+			_dataDebug.pushBack(etk::makePair(kkk, usedId[kkk]));
 		}
 	}
 	DOLLAR_DEBUG("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
@@ -152,15 +152,15 @@ float dollar::EnginePPlus::calculatePPlusDistanceSimple(const std::vector<vec2>&
 }
 
 
-float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _points,
-                                                  const std::vector<vec2>& _reference,
-                                                  std::vector<std::pair<int32_t, int32_t>>& _dataDebug,
+float dollar::EnginePPlus::calculatePPlusDistance(const etk::Vector<vec2>& _points,
+                                                  const etk::Vector<vec2>& _reference,
+                                                  etk::Vector<etk::Pair<int32_t, int32_t>>& _dataDebug,
                                                   float _inputAspectRatio,
                                                   float _referenceAspectRatio) {
-	std::vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
+	etk::Vector<float> distance; // note: use square distance (faster, we does not use std::sqrt())
 	distance.resize(_points.size(), MAX_FLOAT);
 	// point Id that is link on the reference.
-	std::vector<int32_t> usedId;
+	etk::Vector<int32_t> usedId;
 	usedId.resize(_reference.size(), -1);
 	for (int32_t iii=0; iii<int32_t(_points.size()); iii++) {
 		if (distance[iii] < 100.0) {
@@ -224,7 +224,7 @@ float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _poin
 	
 	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {
 		if (usedId[kkk] != -1) {
-			_dataDebug.push_back(std::make_pair(usedId[kkk], kkk));
+			_dataDebug.pushBack(etk::makePair(usedId[kkk], kkk));
 		}
 	}
 	DOLLAR_DEBUG("test distance : " << fullDistance << " nbTestNotUsed=" << nbTestNotUsed << " nbReferenceNotUsed=" << nbReferenceNotUsed);
@@ -233,7 +233,7 @@ float dollar::EnginePPlus::calculatePPlusDistance(const std::vector<vec2>& _poin
 
 
 
-bool dollar::EnginePPlus::loadGesture(const std::string& _filename) {
+bool dollar::EnginePPlus::loadGesture(const etk::String& _filename) {
 	ememory::SharedPtr<dollar::Gesture> ref = ememory::makeShared<dollar::GesturePPlus>();
 	DOLLAR_DEBUG("Load Gesture: " << _filename);
 	if (ref->load(_filename) == true) {
@@ -247,17 +247,17 @@ void dollar::EnginePPlus::addGesture(ememory::SharedPtr<dollar::Gesture> _gestur
 	ememory::SharedPtr<dollar::GesturePPlus> gest = ememory::dynamicPointerCast<dollar::GesturePPlus>(_gesture);
 	if (gest != nullptr) {
 		gest->configure(m_PPlusDistance, m_scaleKeepRatio);
-		m_gestures.push_back(gest);
+		m_gestures.pushBack(gest);
 	}
 }
 
-static void storeSVG(const std::string& _fileName,
+static void storeSVG(const etk::String& _fileName,
                      const ememory::SharedPtr<dollar::GesturePPlus>& _gesture,
-                     const std::vector<std::vector<vec2>>& _strokes,
-                     const std::vector<vec2>& _points,
-                     std::vector<std::pair<int32_t, int32_t>> _links,
+                     const etk::Vector<etk::Vector<vec2>>& _strokes,
+                     const etk::Vector<vec2>& _points,
+                     etk::Vector<etk::Pair<int32_t, int32_t>> _links,
                      bool _keepAspectRatio) {
-	std::string data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itLines : dollar::scaleToOne(_gesture->getPath(), _keepAspectRatio)) {
 		data += "	<polyline fill=\"none\" stroke=\"black\" stroke-opacity=\"0.8\" stroke-width=\"2\"\n";
@@ -268,7 +268,7 @@ static void storeSVG(const std::string& _fileName,
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+			data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
@@ -282,25 +282,25 @@ static void storeSVG(const std::string& _fileName,
 				data += " ";
 			}
 			first = false;
-			data += etk::to_string(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+			data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
 	}
-	std::vector<vec2> refListPoint = _gesture->getEnginePoints();
+	etk::Vector<vec2> refListPoint = _gesture->getEnginePoints();
 	for (auto &it : refListPoint) {
-		data += "	<circle fill=\"red\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
+		data += "	<circle fill=\"red\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 	}
-	std::vector<vec2> testListPoint = _points;
+	etk::Vector<vec2> testListPoint = _points;
 	for (auto &it : testListPoint) {
-		data += "	<circle fill=\"orange\" cx=\"" + etk::to_string(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
+		data += "	<circle fill=\"orange\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 	}
 	for (auto &it : _links) {
 		data += "	<polyline fill=\"none\" stroke=\"blue\" stroke-opacity=\"0.8\" stroke-width=\"0.5\"\n";
 		data += "	          points=\"";
-		data += etk::to_string(refListPoint[it.second].x()*100.0f) + "," + etk::to_string((1.0-refListPoint[it.second].y())*100.0f);
+		data += etk::toString(refListPoint[it.second].x()*100.0f) + "," + etk::to_string((1.0-refListPoint[it.second].y())*100.0f);
 		data += " ";
-		data += etk::to_string(testListPoint[it.first].x()*100.0f) + "," + etk::to_string((1.0-testListPoint[it.first].y())*100.0f);
+		data += etk::toString(testListPoint[it.first].x()*100.0f) + "," + etk::to_string((1.0-testListPoint[it.first].y())*100.0f);
 		data += "\"\n";
 		data += "	          />\n";
 	}
@@ -309,8 +309,8 @@ static void storeSVG(const std::string& _fileName,
 }
 
 
-dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<vec2>>& _strokes) {
-	std::vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, m_scaleKeepRatio);
+dollar::Results dollar::EnginePPlus::recognize2(const etk::Vector<etk::Vector<vec2>>& _strokes) {
+	etk::Vector<vec2> points = dollar::normalizePathToPoints(_strokes, m_PPlusDistance, m_scaleKeepRatio);
 	float inputAspectRatio = dollar::getAspectRatio(_strokes);
 	// Keep maximum 5 results ...
 	float bestDistance[m_nbResult];
@@ -335,13 +335,13 @@ dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<ve
 		}
 		*/
 		float distance = MAX_FLOAT;
-		std::vector<std::pair<int32_t, int32_t>> dataPair;
+		etk::Vector<etk::Pair<int32_t, int32_t>> dataPair;
 		distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair, inputAspectRatio, gesture->getAspectRatio());
 		//distance = calculatePPlusDistanceSimple(points, gesture->getEnginePoints(), dataPair);
 		if (nbStrokeRef != nbStrokeSample) {
 			distance += 0.1f*float(std::abs(nbStrokeRef-nbStrokeSample));
 		}
-		//storeSVG("out_dollar/lib/recognizePPlus/" + gesture->getName() + "_" + etk::to_string(gesture->getId()) + ".svg", gesture, _strokes, points, dataPair, m_scaleKeepRatio);
+		//storeSVG("out_dollar/lib/recognizePPlus/" + gesture->getName() + "_" + etk::toString(gesture->getId()) + ".svg", gesture, _strokes, points, dataPair, m_scaleKeepRatio);
 		for (size_t kkk=0; kkk<m_nbResult; ++kkk) {
 			if (distance < bestDistance[kkk]) {
 				if (kkk == 0) {
@@ -371,7 +371,7 @@ dollar::Results dollar::EnginePPlus::recognize2(const std::vector<std::vector<ve
 	Results res;
 	for (size_t iii=0; iii<m_nbResult; ++iii) {
 		if (-1 != indexOfBestMatch[iii]) {
-			//float score = std::max((2.0 - bestDistance[iii])/2.0, 0.0);
+			//float score = etk::max((2.0 - bestDistance[iii])/2.0, 0.0);
 			float score = bestDistance[iii];
 			res.addValue(m_gestures[indexOfBestMatch[iii]]->getName(), score);
 		}

@@ -8,24 +8,24 @@
 #include <etk/math/Vector2D.hpp>
 #include <dollar/Gesture.hpp>
 
-#include <string>
+#include <etk/String.hpp>
 
 namespace dollar {
 	class GestureP : public dollar::Gesture {
 		public:
 			GestureP();
 		protected:
-			std::vector<vec2> m_enginePoints;
+			etk::Vector<vec2> m_enginePoints;
 		public:
 			// Configure the reference gesture for recognition...
 			void configure(size_t _nbSample);
-			const std::vector<vec2>& getEnginePoints() const {
+			const etk::Vector<vec2>& getEnginePoints() const {
 				return m_enginePoints;
 			}
-			const std::vector<vec2>& getPath() const {
+			const etk::Vector<vec2>& getPath() const {
 				return m_enginePoints;
 			}
-			std::vector<vec2>& getPath() {
+			etk::Vector<vec2>& getPath() {
 				return m_enginePoints;
 			}
 	};

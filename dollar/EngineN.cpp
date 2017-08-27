@@ -41,7 +41,7 @@ static float angleBetweenUnitVectors(const vec2& _vect1, const vec2& _vect2) {
 	return std::acos(n); // arc cosine of the vector dot product
 }
 
-static float pathDistance(const std::vector<vec2>& _path1, const std::vector<vec2>& _path2) {
+static float pathDistance(const etk::Vector<vec2>& _path1, const etk::Vector<vec2>& _path2) {
 	// assumes pts1.size == pts2.size
 	float distance = 0.0;
 	if (_path1.size() != _path2.size()) {
@@ -81,7 +81,7 @@ size_t dollar::EngineN::getNumberPointInGesture() {
 	return m_numPointsInGesture;
 }
 
-float dollar::EngineN::distanceAtBestAngle(const std::vector<vec2>& _points, const std::vector<vec2>& _reference) {
+float dollar::EngineN::distanceAtBestAngle(const etk::Vector<vec2>& _points, const etk::Vector<vec2>& _reference) {
 	float startRange = -m_angleRange;
 	float endRange = m_angleRange;
 	float x1 = MAGIC_RATIO * startRange + (1.0 - MAGIC_RATIO) * endRange;
@@ -104,11 +104,11 @@ float dollar::EngineN::distanceAtBestAngle(const std::vector<vec2>& _points, con
 			f2 = pathDistance(dollar::rotateBy(_points, x2), _reference);
 		}
 	}
-	return std::min(f1, f2);
+	return etk::min(f1, f2);
 }
 
 
-float dollar::EngineN::optimalCosineDistance(const std::vector<vec2>& _vect1, const std::vector<vec2>& _vect2) {
+float dollar::EngineN::optimalCosineDistance(const etk::Vector<vec2>& _vect1, const etk::Vector<vec2>& _vect2) {
 	if (_vect1.size() != _vect2.size()) {
 		DOLLAR_ERROR("Vector have not the same size: " << _vect1.size() << " != " << _vect2.size());
 		return M_PI;
@@ -138,7 +138,7 @@ void dollar::EngineN::setRotationInvariance(bool _ignoreRotation) {
 	}
 }
 
-bool dollar::EngineN::loadGesture(const std::string& _filename) {
+bool dollar::EngineN::loadGesture(const etk::String& _filename) {
 	ememory::SharedPtr<dollar::Gesture> ref = ememory::makeShared<dollar::GestureN>();
 	DOLLAR_DEBUG("Load Gesture: " << _filename);
 	if (ref->load(_filename) == true) {
@@ -152,16 +152,16 @@ void dollar::EngineN::addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) {
 	ememory::SharedPtr<dollar::GestureN> gest = ememory::dynamicPointerCast<dollar::GestureN>(_gesture);
 	if (gest != nullptr) {
 		gest->configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation);
-		m_gestures.push_back(gest);
+		m_gestures.pushBack(gest);
 	}
 }
 
 
-dollar::Results dollar::EngineN::recognize2(const std::vector<std::vector<vec2>>& _strokes) {
-	std::vector<vec2> points = dollar::combineStrokes(_strokes);
+dollar::Results dollar::EngineN::recognize2(const etk::Vector<etk::Vector<vec2>>& _strokes) {
+	etk::Vector<vec2> points = dollar::combineStrokes(_strokes);
 	points = dollar::normalizePath(points, m_numPointsInGesture, m_paramterIgnoreRotation, false);
 	vec2 startv = dollar::getStartVector(points, m_numPointsInGesture/RATIO_START_VECTOR);
-	std::vector<vec2> vector = normalyse(points);
+	etk::Vector<vec2> vector = normalyse(points);
 	// Keep maximum 5 results ...
 	float bestDistance[m_nbResult];
 	int32_t indexOfBestMatch[m_nbResult];
