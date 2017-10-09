@@ -219,7 +219,7 @@ float dollar::EnginePPlus::calculatePPlusDistance(const etk::Vector<vec2>& _poin
 	// now we add panality:
 	fullDistance += float(nbTestNotUsed)* m_penalityNotLinkSample;
 	fullDistance += float(nbReferenceNotUsed)* m_penalityNotLinkRef;
-	fullDistance += std::abs(_inputAspectRatio - _referenceAspectRatio)*m_penalityAspectRatio;
+	fullDistance += etk::abs(_inputAspectRatio - _referenceAspectRatio)*m_penalityAspectRatio;
 	
 	
 	for (size_t kkk=0; kkk<usedId.size(); ++kkk) {
@@ -339,7 +339,7 @@ dollar::Results dollar::EnginePPlus::recognize2(const etk::Vector<etk::Vector<ve
 		distance = calculatePPlusDistance(points, gesture->getEnginePoints(), dataPair, inputAspectRatio, gesture->getAspectRatio());
 		//distance = calculatePPlusDistanceSimple(points, gesture->getEnginePoints(), dataPair);
 		if (nbStrokeRef != nbStrokeSample) {
-			distance += 0.1f*float(std::abs(nbStrokeRef-nbStrokeSample));
+			distance += 0.1f*float(etk::abs(nbStrokeRef-nbStrokeSample));
 		}
 		//storeSVG("out_dollar/lib/recognizePPlus/" + gesture->getName() + "_" + etk::toString(gesture->getId()) + ".svg", gesture, _strokes, points, dataPair, m_scaleKeepRatio);
 		for (size_t kkk=0; kkk<m_nbResult; ++kkk) {

@@ -55,7 +55,7 @@ void appl::widget::TextAreaRecognition::setCompare(const etk::String& _compare) 
 	m_compare = _compare;
 }
 
-void appl::widget::TextAreaRecognition::store(const etk::String& _userName, const etk::String& _value, const std::string& _type) {
+void appl::widget::TextAreaRecognition::store(const etk::String& _userName, const etk::String& _value, const etk::String& _type) {
 	if (m_dataList.size() == 0) {
 		return;
 	}

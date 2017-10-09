@@ -38,7 +38,7 @@ static float angleBetweenUnitVectors(const vec2& _vect1, const vec2& _vect2) {
 	if (n < -1.0 || n > +1.0){
 		n = round(n*100000.0f)/100000.0f;
 	}
-	return std::acos(n); // arc cosine of the vector dot product
+	return etk::acos(n); // arc cosine of the vector dot product
 }
 
 static float pathDistance(const etk::Vector<vec2>& _path1, const etk::Vector<vec2>& _path2) {
@@ -123,8 +123,8 @@ float dollar::EngineN::optimalCosineDistance(const etk::Vector<vec2>& _vect1, co
 		DOLLAR_ERROR("devide by 0");
 		return M_PI;
 	}
-	float angle = std::atan(somCross / somDot);
-	return std::acos(somDot * std::cos(angle) + somCross * std::sin(angle));
+	float angle = etk::atan(somCross / somDot);
+	return etk::acos(somDot * etk::cos(angle) + somCross * etk::sin(angle));
 }
 
 

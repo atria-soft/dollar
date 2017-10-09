@@ -35,7 +35,7 @@ static etk::Vector<etk::Vector<vec2>> loadPointsJson(const ejson::Document& _doc
 	return out;
 }
 
-etk::Vector<etk::Vector<vec2>> dollar::loadPoints(const etk::String& _fileName, etk::String* _label, std::string* _type) {
+etk::Vector<etk::Vector<vec2>> dollar::loadPoints(const etk::String& _fileName, etk::String* _label, etk::String* _type) {
 	ejson::Document doc;
 	doc.load(_fileName);
 	if (_label != nullptr) {

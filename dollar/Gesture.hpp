@@ -46,5 +46,5 @@ namespace dollar {
 	 * @brief Load all point from a specific file
 	 *
 	 */
-	etk::Vector<etk::Vector<vec2>> loadPoints(const etk::String& _fileName, etk::String* _label=nullptr, std::string* _type=nullptr);
+	etk::Vector<etk::Vector<vec2>> loadPoints(const etk::String& _fileName, etk::String* _label=nullptr, etk::String* _type=nullptr);
 }

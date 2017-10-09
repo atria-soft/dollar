@@ -119,7 +119,7 @@ int main(int _argc, const char *_argv[]) {
 	return testCorpus(srcCorpus);
 }
 
-void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& _list, const std::string& _refName) {
+void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& _list, const etk::String& _refName) {
 	TEST_PRINT("    " << _fileName);
 	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";

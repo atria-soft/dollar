@@ -32,8 +32,8 @@ vec2 dollar::getBaryCenter(const etk::Vector<vec2>& _points) {
 etk::Vector<vec2> dollar::rotateBy(const etk::Vector<vec2>& _points, float _rotation) {
 	etk::Vector<vec2> out;
 	vec2 center = getBaryCenter(_points);
-	float cosine = std::cos(_rotation);
-	float sine   = std::sin(_rotation);
+	float cosine = etk::cos(_rotation);
+	float sine   = etk::sin(_rotation);
 	for (auto &it : _points) {
 		float qx = (it.x() - center.x()) * cosine - (it.y() - center.y()) * sine   + center.x();
 		float qy = (it.x() - center.x()) * sine   + (it.y() - center.y()) * cosine + center.y();
@@ -44,7 +44,7 @@ etk::Vector<vec2> dollar::rotateBy(const etk::Vector<vec2>& _points, float _rota
 
 etk::Vector<vec2> dollar::rotateToZero(const etk::Vector<vec2>& _points) {
 	vec2 center = getBaryCenter(_points);
-	float rotation = std::atan2(center.y() - _points[0].y(), center.x() - _points[0].x());
+	float rotation = etk::atan2(center.y() - _points[0].y(), center.x() - _points[0].x());
 	return rotateBy(_points, -rotation);
 }
 

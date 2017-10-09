@@ -63,7 +63,7 @@ namespace appl {
 			public:
 				void clear();
 				void undo();
-				void store(const etk::String& _userName, const etk::String& _value, const std::string& _type);
+				void store(const etk::String& _userName, const etk::String& _value, const etk::String& _type);
 				void setCompare(const etk::String& _compare);
 			public:
 				void onDraw() override;

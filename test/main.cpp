@@ -9,14 +9,14 @@
 
 #include <etk/etk.hpp>
 #include <test-debug/debug.hpp>
-#include <gtest/gtest.h>
+#include <etest/etest.hpp>
 
 int main(int _argc, const char *_argv[]) {
 	// init Google test :
 	::testing::InitGoogleTest(&_argc, const_cast<char **>(_argv));
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
-	// Run all test with gtest
+	// Run all test with etest
 	return RUN_ALL_TESTS();
 }
 

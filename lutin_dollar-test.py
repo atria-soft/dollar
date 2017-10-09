@@ -32,7 +32,7 @@ def configure(target, my_module):
 	    'dollar',
 	    'dollar-data',
 	    'test-debug',
-	    'gtest',
+	    'etest',
 	    ])
 	my_module.copy_path('data/test/*.json', 'test')
 	return True
