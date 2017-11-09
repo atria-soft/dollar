@@ -80,7 +80,7 @@ etk::Vector<vec2> dollar::scaleToOne(const etk::Vector<vec2>& _points, bool _kee
 	return out;
 }
 
-etk::Vector<etk::Vector<vec2>> dollar::scaleToOne(const std::vector<std::vector<vec2>>& _points, bool _keepAspectRation) {
+etk::Vector<etk::Vector<vec2>> dollar::scaleToOne(const etk::Vector<etk::Vector<vec2>>& _points, bool _keepAspectRation) {
 	dollar::Rectangle box(_points);
 	etk::Vector<etk::Vector<vec2>> out;
 	vec2 scale(1.0f/box.getSize().x(), 1.0f/box.getSize().y());
@@ -162,7 +162,7 @@ etk::Vector<vec2> dollar::resample(etk::Vector<vec2> _points, int32_t _nbPoints)
 	return out;
 }
 
-etk::Vector<etk::Vector<vec2>> dollar::makeReferenceStrokes(const std::vector<std::vector<vec2>>& _strokes) {
+etk::Vector<etk::Vector<vec2>> dollar::makeReferenceStrokes(const etk::Vector<etk::Vector<vec2>>& _strokes) {
 	etk::Vector<etk::Vector<vec2>> out;
 	// create the ordr of all possibilities of writing the strokes ... (ABC, ACB, BAC, BCA ...)
 	etk::Vector<size_t> order;
@@ -172,7 +172,7 @@ etk::Vector<etk::Vector<vec2>> dollar::makeReferenceStrokes(const std::vector<st
 	// For all orders (every permutation of the path):
 	do {
 		// now we have an other problem: the user can write in multiple way the path
-		size_t nbPermutation = std::pow(2, order.size());
+		size_t nbPermutation = etk::pow(2.0f, float(order.size()));
 		// we use the bit like a flag to know the order of the draw
 		for (size_t permut=0; permut<nbPermutation; ++permut) {
 			etk::Vector<vec2> stroke;
@@ -180,7 +180,9 @@ etk::Vector<etk::Vector<vec2>> dollar::makeReferenceStrokes(const std::vector<st
 				etk::Vector<vec2> pts = _strokes[order[iii]];
 				// check to permut the value order
 				if (((permut>>iii) & 0x01) == 1) {
-					reverse(pts.begin(),pts.end());
+					for (size_t kkk=0; kkk < pts.size()/2; ++kkk) {
+						etk::swap(pts[kkk], pts[pts.size()-1-kkk]);
+					}
 				}
 				// Add point in next of the path...
 				for (auto &it : pts) {
@@ -190,11 +192,11 @@ etk::Vector<etk::Vector<vec2>> dollar::makeReferenceStrokes(const std::vector<st
 			// Add new generated stroke
 			out.pushBack(stroke);
 		}
-	} while (next_permutation(order.begin(), order.end()));
+	} while (false); // TODO : Set back: next_permutation(order.begin(), order.end()));
 	return out;
 }
 
-etk::Vector<vec2> dollar::combineStrokes(const etk::Vector<std::vector<vec2>>& _strokes) {
+etk::Vector<vec2> dollar::combineStrokes(const etk::Vector<etk::Vector<vec2>>& _strokes) {
 	etk::Vector<vec2> out;
 	for (auto &it : _strokes) {
 		for (auto &pointIt : it) {
@@ -250,7 +252,7 @@ float dollar::getAspectRatio(etk::Vector<etk::Vector<vec2>> _points) {
 	}
 }
 
-etk::Vector<vec2> dollar::normalizePathToPoints(etk::Vector<std::vector<vec2>> _points, float _distance, bool _keepAspectRatio) {
+etk::Vector<vec2> dollar::normalizePathToPoints(etk::Vector<etk::Vector<vec2>> _points, float _distance, bool _keepAspectRatio) {
 	// Scale point to (0.0,0.0) position and (1.0,1.0) size
 	_points = dollar::scaleToOne(_points, _keepAspectRatio);
 	etk::Vector<vec2> out;

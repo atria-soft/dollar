@@ -9,6 +9,7 @@
 #include <ewol/compositing/Drawing.hpp>
 #include <ewol/compositing/Text.hpp>
 #include <ewol/widget/Manager.hpp>
+#include <echrono/echrono.hpp>
 
 #include <dollar/Engine.hpp>
 
@@ -41,8 +42,8 @@ namespace appl {
 				ewol::compositing::Text m_text; //!< drawing instance
 				etk::Vector<DrawingLine> m_dataList;
 				DrawingLine m_current;
-				std::chrono::system_clock::time_point m_time;
-				std::chrono::system_clock::time_point m_lastEvent;
+				echrono::Clock m_time;
+				echrono::Clock m_lastEvent;
 				esignal::Connection m_periodicConnection;
 				bool m_updateDone;
 				etk::String m_svgData;
@@ -51,7 +52,7 @@ namespace appl {
 				ememory::SharedPtr<dollar::Engine> m_dollarEngine;
 				dollar::Results m_dollarResults;
 				etk::String m_findValue;
-				std::chrono::milliseconds m_dollarTime;
+				echrono::Duration m_dollarTime;
 			protected:
 				//! @brief constructor
 				TextAreaRecognition();

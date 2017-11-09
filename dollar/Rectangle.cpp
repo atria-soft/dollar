@@ -6,7 +6,9 @@
 #include <dollar/Rectangle.hpp>
 #include <dollar/debug.hpp>
 
-#define MAX_FLOAT std::numeric_limits<float>::max()
+#include <etk/types.hpp>
+
+//#define MAX_FLOAT std::numeric_limits<float>::max()
 
 dollar::Rectangle::Rectangle(const vec2& _pos, const vec2& _size):
   m_pos(_pos),
@@ -14,8 +16,8 @@ dollar::Rectangle::Rectangle(const vec2& _pos, const vec2& _size):
 	
 }
 dollar::Rectangle::Rectangle(const etk::Vector<vec2>& _points) {
-	vec2 minPos(MAX_FLOAT,MAX_FLOAT);
-	vec2 maxPos(-MAX_FLOAT,-MAX_FLOAT);
+	vec2 minPos(FLT_MAX, FLT_MAX);
+	vec2 maxPos(FLT_MIN, FLT_MIN);
 	for (auto &it : _points) {
 		minPos.setMin(it);
 		maxPos.setMax(it);
@@ -24,8 +26,8 @@ dollar::Rectangle::Rectangle(const etk::Vector<vec2>& _points) {
 	m_size = maxPos-minPos;
 }
 dollar::Rectangle::Rectangle(const etk::Vector<etk::Vector<vec2>>& _points) {
-	vec2 minPos(MAX_FLOAT,MAX_FLOAT);
-	vec2 maxPos(-MAX_FLOAT,-MAX_FLOAT);
+	vec2 minPos(FLT_MAX, FLT_MAX);
+	vec2 maxPos(FLT_MIN, FLT_MIN);
 	for (auto &it : _points) {
 		for (auto &itPoint : it) {
 			minPos.setMin(itPoint);

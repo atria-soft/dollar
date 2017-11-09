@@ -23,7 +23,7 @@ void appl::widget::TextAreaRecognition::init() {
 	//m_dollarEngine.loadPath("DATA:text");
 	m_dollarEngine = dollar::createEngine("$P+");
 	m_dollarEngine->loadPath("DATA:reference");
-	m_dollarEngine->setScaleKeepRatio(true);
+	// TODO: m_dollarEngine->setScaleKeepRatio(true);
 	markToRedraw();
 	// connect a periodic update ...
 	m_periodicConnection = getObjectManager().periodicCall.connect(this, &appl::widget::TextAreaRecognition::callbackPeriodicUpdate);
@@ -38,7 +38,7 @@ appl::widget::TextAreaRecognition::~TextAreaRecognition() {
 void appl::widget::TextAreaRecognition::clear() {
 	m_dataList.clear();
 	m_current.clear();
-	m_time = std::chrono::system_clock::now();
+	m_time = echrono::Clock::now();
 	markToRedraw();
 }
 
@@ -47,7 +47,7 @@ void appl::widget::TextAreaRecognition::undo() {
 		return;
 	}
 	m_dataList.erase(m_dataList.begin()+(m_dataList.size()-1));
-	m_time = std::chrono::system_clock::now();
+	m_time = echrono::Clock::now();
 	markToRedraw();
 }
 
@@ -64,7 +64,7 @@ void appl::widget::TextAreaRecognition::store(const etk::String& _userName, cons
 	doc.add("user", ejson::String(_userName));
 	doc.add("value", ejson::String(_value));
 	doc.add("type", ejson::String(_type));
-	doc.add("time", ejson::Number(m_time.time_since_epoch().count()));
+	doc.add("time", ejson::Number(m_time.get()));
 	ejson::Array list;
 	doc.add("data", list);
 	for (auto &it : m_dataList) {
@@ -95,7 +95,7 @@ void appl::widget::TextAreaRecognition::store(const etk::String& _userName, cons
 	fileName += "_";
 	fileName += _userName;
 	fileName += "_";
-	fileName += etk::toString(m_time.time_since_epoch().count());
+	fileName += etk::toString(m_time.get());
 	fileName += ".json";
 	etk::FSNodeWriteAllData(fileName, streamOut);
 	APPL_WARNING("store: " << fileName);
@@ -106,10 +106,10 @@ void appl::widget::TextAreaRecognition::onDraw() {
 	m_text.draw();
 }
 
-etk::Vector<etk::Vector<vec2>> scalePoints(std::vector<std::vector<vec2>> _list, float _objectSize) {
+etk::Vector<etk::Vector<vec2>> scalePoints(etk::Vector<etk::Vector<vec2>> _list, float _objectSize) {
 	// get min/max point
-	vec2 minPos(99999999,99999999);
-	vec2 maxPos(0,0);
+	vec2 minPos(FLT_MAX, FLT_MAX);
+	vec2 maxPos(FLT_MIN, FLT_MIN);
 	for (auto &itLines : _list) {
 		for (auto& itPoints : itLines) {
 			minPos.setMin(itPoints);
@@ -119,7 +119,7 @@ etk::Vector<etk::Vector<vec2>> scalePoints(std::vector<std::vector<vec2>> _list,
 	// center and reduce to a size of XXX
 	float scale = 1.0f;
 	vec2 size = maxPos-minPos;
-	vec2 center(0,0);
+	vec2 center(0, 0);
 	if (size.x() > size.y()) {
 		scale = _objectSize/size.x();
 		center.setY((_objectSize-size.y()*scale)*0.5);
@@ -137,11 +137,11 @@ etk::Vector<etk::Vector<vec2>> scalePoints(std::vector<std::vector<vec2>> _list,
 	return _list;
 }
 
-etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<std::vector<vec2>>& _list, int32_t _objectSize, const etk::String& _filename) {
+etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<etk::Vector<vec2>>& _list, int32_t _objectSize, const etk::String& _filename) {
 	// generate SVG to render:
 	esvg::Document docSvg;
 	etk::String data("<?xml version='1.0' encoding='UTF-8' standalone='no'?>\n");
-	data += "<svg height='" + etk::toString(_objectSize) + "' width='" + etk::to_string(_objectSize) + "'>\n";
+	data += "<svg height='" + etk::toString(_objectSize) + "' width='" + etk::toString(_objectSize) + "'>\n";
 	for (auto &itLines : _list) {
 		data += "	<polyline\n";
 		data += "	          fill='none'\n";
@@ -155,7 +155,7 @@ etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<std::vector<vec
 				data += " ";
 			}
 			first = false;
-			data += etk::toString(itPoints.x()) + "," + etk::to_string(itPoints.y());
+			data += etk::toString(itPoints.x()) + "," + etk::toString(itPoints.y());
 		}
 		data += "'\n";
 		data += "	          />\n";
@@ -294,7 +294,7 @@ void appl::widget::TextAreaRecognition::onRegenerateDisplay() {
 		}
 		m_text.setColor(etk::color::white);
 		m_text.setPos(vec2(0, m_text.getHeight()*2));
-		m_text.print("Dollar=" + etk::toString(m_dollarTime.count()) + " ms");
+		m_text.print("Dollar=" + etk::toString(m_dollarTime.get()) + " ms");
 	}
 }
 
@@ -306,7 +306,7 @@ bool appl::widget::TextAreaRecognition::onEventInput(const ewol::event::Input& _
 	         || m_current.m_type == _event.getType()
 	       )
 	    ) {
-		m_time = std::chrono::system_clock::now();
+		m_time = echrono::Clock::now();
 		if(_event.getStatus() == gale::key::status::down) {
 			m_current.m_type = _event.getType();
 			m_current.addPoint(relativePosition(_event.getPos()));
@@ -320,7 +320,7 @@ bool appl::widget::TextAreaRecognition::onEventInput(const ewol::event::Input& _
 			m_current.addPoint(relativePosition(_event.getPos()));
 		}
 		markToRedraw();
-		m_lastEvent = std::chrono::system_clock::now();
+		m_lastEvent = echrono::Clock::now();
 		m_updateDone = false;
 		m_findValue = "";
 		m_dollarResults.clear();
@@ -329,7 +329,7 @@ bool appl::widget::TextAreaRecognition::onEventInput(const ewol::event::Input& _
 	return false;
 }
 
-static etk::Vector<etk::Vector<vec2>> convertInLines(const std::vector<appl::DrawingLine>& _list) {
+static etk::Vector<etk::Vector<vec2>> convertInLines(const etk::Vector<appl::DrawingLine>& _list) {
 	etk::Vector<etk::Vector<vec2>> out;
 	for (auto &it : _list) {
 		if (it.m_data.size() > 1) {
@@ -343,7 +343,7 @@ static etk::Vector<etk::Vector<vec2>> convertInLines(const std::vector<appl::Dra
 
 
 void appl::widget::TextAreaRecognition::callbackPeriodicUpdate(const ewol::event::Time& _event) {
-	if (    (std::chrono::system_clock::now() - m_lastEvent) > std::chrono::milliseconds(1200)
+	if (    (echrono::Clock::now() - m_lastEvent) > echrono::milliseconds(1200)
 	     && m_updateDone == false) {
 		if (m_current.m_data.size() != 0) {
 			// ==> writing in progress
@@ -362,11 +362,11 @@ void appl::widget::TextAreaRecognition::callbackPeriodicUpdate(const ewol::event
 			return;
 		}
 		
-		std::chrono::system_clock::time_point tic = std::chrono::system_clock::now();
+		echrono::Clock tic = echrono::Clock::now();
 		// First Test with dollar engine
 		m_dollarResults = m_dollarEngine->recognize(fullListlines);
 		m_findValue = m_dollarResults.getName();
-		m_dollarTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - tic);
+		m_dollarTime = echrono::Clock::now() - tic;
 		markToRedraw();
 		m_updateDone = true;
 	}

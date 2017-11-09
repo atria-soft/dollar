@@ -13,6 +13,7 @@
 #include <limits>
 #include <iostream>
 #include <etk/String.hpp>
+#include <etk/Pair.hpp>
 
 namespace dollar {
 	class EnginePPlus : public dollar::Engine {

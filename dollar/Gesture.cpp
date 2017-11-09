@@ -164,7 +164,7 @@ void dollar::Gesture::storeSVG(const etk::String& _fileName, bool _storeDot) {
 				data += " ";
 			}
 			first = false;
-			data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+			data += etk::toString(itPoints.x()*100.0f) + "," + etk::toString((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
@@ -172,7 +172,7 @@ void dollar::Gesture::storeSVG(const etk::String& _fileName, bool _storeDot) {
 	if (_storeDot == true) {
 		/*
 		for (auto &it : m_enginePoints) {
-			data += "	<circle fill=\"red\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
+			data += "	<circle fill=\"red\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::toString((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 		}
 		*/
 	}

@@ -54,7 +54,7 @@ namespace dollar {
 	 * @param[in] _keepAspectRation Keep the aspect ratio of the scaling
 	 * @return modify points
 	 */
-	etk::Vector<etk::Vector<vec2>> scaleToOne(const std::vector<std::vector<vec2>>& _points, bool _keepAspectRation=false);
+	etk::Vector<etk::Vector<vec2>> scaleToOne(const etk::Vector<etk::Vector<vec2>>& _points, bool _keepAspectRation=false);
 	/**
 	 * @brief Get center of the path and move the path to be center at (0,0)
 	 * @param[in] _points List of point in the path
@@ -73,13 +73,13 @@ namespace dollar {
 	 * @param[in] _strokes List of all strokes
 	 * @return List of a list of single stroke of multiple stroke
 	 */
-	etk::Vector<etk::Vector<vec2>> makeReferenceStrokes(const std::vector<std::vector<vec2>>& _strokes);
+	etk::Vector<etk::Vector<vec2>> makeReferenceStrokes(const etk::Vector<etk::Vector<vec2>>& _strokes);
 	/**
 	 * @brief combine some stroke in a single one.
 	 * @param[in] _strokes value to merge
 	 * @return Merged vector
 	 */
-	etk::Vector<vec2> combineStrokes(const etk::Vector<std::vector<vec2>>& _strokes);
+	etk::Vector<vec2> combineStrokes(const etk::Vector<etk::Vector<vec2>>& _strokes);
 	/**
 	 * @brief Normalise the Path with the full magnetude of the data
 	 * @param[in] _points Input path
@@ -111,7 +111,7 @@ namespace dollar {
 	 * @param[in] _keepAspectRatio Keep Aspect ratio when scaling to the correct size (1.0,1.0) (it will be centered)
 	 * @return new list of points
 	 */
-	etk::Vector<vec2> normalizePathToPoints(etk::Vector<std::vector<vec2>> _points, float _distance, bool _keepAspectRatio);
+	etk::Vector<vec2> normalizePathToPoints(etk::Vector<etk::Vector<vec2>> _points, float _distance, bool _keepAspectRatio);
 	/**
 	 * @brief get the aspect ratio of a list of points
 	 * @param[in] _points List of points

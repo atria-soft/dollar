@@ -124,7 +124,7 @@ void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& 
 					data += " ";
 				}
 				first = false;
-				data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+				data += etk::toString(itPoints.x()*100.0f) + "," + etk::toString((1.0-itPoints.y())*100.0f);
 			}
 			data += "\"\n";
 			data += "	          />\n";

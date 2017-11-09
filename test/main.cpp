@@ -12,10 +12,7 @@
 #include <etest/etest.hpp>
 
 int main(int _argc, const char *_argv[]) {
-	// init Google test :
-	::testing::InitGoogleTest(&_argc, const_cast<char **>(_argv));
-	// init etk log system and file interface:
-	etk::init(_argc, _argv);
+	etest::init(_argc, _argv);
 	// Run all test with etest
 	return RUN_ALL_TESTS();
 }
@@ -35,8 +32,8 @@ TEST(TestAll, singleStroke_normal) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N");
 	reco->loadPath("DATA:figure");
 	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/arrow.json"));
-	EXPECT_EQ(res.haveMath(), true);
-	if (res.haveMath() == false) {
+	EXPECT_EQ(res.haveMatch(), true);
+	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
 		return;
 	}
@@ -51,8 +48,8 @@ TEST(TestAll, singleStroke_protractor) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N");
 	reco->loadPath("DATA:figure");
 	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/arrow.json"));
-	EXPECT_EQ(res.haveMath(), true);
-	if (res.haveMath() == false) {
+	EXPECT_EQ(res.haveMatch(), true);
+	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
 		return;
 	}
@@ -71,8 +68,8 @@ TEST(TestAll, multiStroke_normal) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N");
 	reco->loadPath("DATA:text");
 	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
-	EXPECT_EQ(res.haveMath(), true);
-	if (res.haveMath() == false) {
+	EXPECT_EQ(res.haveMatch(), true);
+	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
 		return;
 	}
@@ -87,8 +84,8 @@ TEST(TestAll, multiStroke_protractor) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N-protractor");
 	reco->loadPath("DATA:text");
 	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
-	EXPECT_EQ(res.haveMath(), true);
-	if (res.haveMath() == false) {
+	EXPECT_EQ(res.haveMatch(), true);
+	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
 		return;
 	}
@@ -105,8 +102,8 @@ TEST(TestAll, multiStroke_point) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$P");
 	reco->loadPath("DATA:text");
 	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
-	EXPECT_EQ(res.haveMath(), true);
-	if (res.haveMath() == false) {
+	EXPECT_EQ(res.haveMatch(), true);
+	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
 		return;
 	}
@@ -123,8 +120,8 @@ TEST(TestAll, multiStroke_pointPlus) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$P+");
 	reco->loadPath("DATA:text");
 	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
-	EXPECT_EQ(res.haveMath(), true);
-	if (res.haveMath() == false) {
+	EXPECT_EQ(res.haveMatch(), true);
+	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
 		return;
 	}

@@ -268,7 +268,7 @@ static void storeSVG(const etk::String& _fileName,
 				data += " ";
 			}
 			first = false;
-			data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+			data += etk::toString(itPoints.x()*100.0f) + "," + etk::toString((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
@@ -282,25 +282,25 @@ static void storeSVG(const etk::String& _fileName,
 				data += " ";
 			}
 			first = false;
-			data += etk::toString(itPoints.x()*100.0f) + "," + etk::to_string((1.0-itPoints.y())*100.0f);
+			data += etk::toString(itPoints.x()*100.0f) + "," + etk::toString((1.0-itPoints.y())*100.0f);
 		}
 		data += "\"\n";
 		data += "	          />\n";
 	}
 	etk::Vector<vec2> refListPoint = _gesture->getEnginePoints();
 	for (auto &it : refListPoint) {
-		data += "	<circle fill=\"red\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
+		data += "	<circle fill=\"red\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::toString((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 	}
 	etk::Vector<vec2> testListPoint = _points;
 	for (auto &it : testListPoint) {
-		data += "	<circle fill=\"orange\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::to_string((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
+		data += "	<circle fill=\"orange\" cx=\"" + etk::toString(it.x()*100.0f) + "\" cy=\"" + etk::toString((1.0-it.y())*100.0f) + "\" r=\"0.6\"/>\n";
 	}
 	for (auto &it : _links) {
 		data += "	<polyline fill=\"none\" stroke=\"blue\" stroke-opacity=\"0.8\" stroke-width=\"0.5\"\n";
 		data += "	          points=\"";
-		data += etk::toString(refListPoint[it.second].x()*100.0f) + "," + etk::to_string((1.0-refListPoint[it.second].y())*100.0f);
+		data += etk::toString(refListPoint[it.second].x()*100.0f) + "," + etk::toString((1.0-refListPoint[it.second].y())*100.0f);
 		data += " ";
-		data += etk::toString(testListPoint[it.first].x()*100.0f) + "," + etk::to_string((1.0-testListPoint[it.first].y())*100.0f);
+		data += etk::toString(testListPoint[it.first].x()*100.0f) + "," + etk::toString((1.0-testListPoint[it.first].y())*100.0f);
 		data += "\"\n";
 		data += "	          />\n";
 	}
