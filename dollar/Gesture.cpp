@@ -38,10 +38,10 @@ static etk::Vector<etk::Vector<vec2>> loadPointsJson(const ejson::Document& _doc
 etk::Vector<etk::Vector<vec2>> dollar::loadPoints(const etk::String& _fileName, etk::String* _label, etk::String* _type) {
 	ejson::Document doc;
 	doc.load(_fileName);
-	if (_label != nullptr) {
+	if (_label != null) {
 		*_label = doc["value"].toString().get();
 	}
-	if (_type != nullptr) {
+	if (_type != null) {
 		*_type = doc["type"].toString().get();
 	}
 	// extract lines:

@@ -31,7 +31,7 @@ void dollar::EnginePPlus::setPPlusDistance(float _value) {
 	}
 	m_PPlusDistance = _value;
 	for (auto &it: m_gestures) {
-		if (it == nullptr) {
+		if (it == null) {
 			continue;
 		}
 		it->configure(m_PPlusDistance, m_scaleKeepRatio);
@@ -58,7 +58,7 @@ void dollar::EnginePPlus::setScaleKeepRatio(bool _value) {
 	}
 	m_scaleKeepRatio = _value;
 	for (auto &it: m_gestures) {
-		if (it == nullptr) {
+		if (it == null) {
 			continue;
 		}
 		it->configure(m_PPlusDistance, m_scaleKeepRatio);
@@ -245,7 +245,7 @@ bool dollar::EnginePPlus::loadGesture(const etk::String& _filename) {
 
 void dollar::EnginePPlus::addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) {
 	ememory::SharedPtr<dollar::GesturePPlus> gest = ememory::dynamicPointerCast<dollar::GesturePPlus>(_gesture);
-	if (gest != nullptr) {
+	if (gest != null) {
 		gest->configure(m_PPlusDistance, m_scaleKeepRatio);
 		m_gestures.pushBack(gest);
 	}

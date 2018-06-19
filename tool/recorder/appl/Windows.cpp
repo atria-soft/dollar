@@ -14,7 +14,7 @@
 #include <etk/tool.hpp>
 
 appl::Windows::Windows() :
-  m_composer(nullptr),
+  m_composer(null),
   m_currentId(0),
   m_currentTypeId(0),
   m_userName("Edouard DUPIN") {
@@ -160,7 +160,7 @@ void appl::Windows::init() {
 	composition += "	</sizer>\n";
 	composition += "</sizer>\n";
 	m_composer = ewol::widget::Composer::create();
-	if (m_composer == nullptr) {
+	if (m_composer == null) {
 		APPL_CRITICAL(" An error occured ... in the windows creatrion ...");
 		return;
 	}
@@ -178,7 +178,7 @@ void appl::Windows::init() {
 	propertySetOnWidgetNamed("current-type", "value", m_listType[m_currentTypeId]);
 	
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->setCompare(m_listType[m_currentTypeId] + " " + m_listValue[m_currentId]);
 	}
 }
@@ -189,14 +189,14 @@ void appl::Windows::onCallbackChangeNameUser(const etk::String& _value) {
 
 void appl::Windows::onCallbackClear() {
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->clear();
 	}
 }
 
 void appl::Windows::onCallbackStore() {
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->store(m_userName, m_listValue[m_currentId], m_listType[m_currentTypeId]);
 		tmpDisp->clear();
 	}
@@ -204,7 +204,7 @@ void appl::Windows::onCallbackStore() {
 
 void appl::Windows::onCallbackUndo() {
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->undo();
 	}
 }
@@ -222,7 +222,7 @@ void appl::Windows::onCallbackPrevious() {
 		propertySetOnWidgetNamed("current-lettre", "value", m_listValue[m_currentId]);
 	}
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->setCompare(m_listType[m_currentTypeId] + " " + m_listValue[m_currentId]);
 	}
 	onCallbackClear();
@@ -241,7 +241,7 @@ void appl::Windows::onCallbackNext() {
 		propertySetOnWidgetNamed("current-lettre", "value", m_listValue[m_currentId]);
 	}
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->setCompare(m_listType[m_currentTypeId] + " " + m_listValue[m_currentId]);
 	}
 	onCallbackClear();
@@ -254,7 +254,7 @@ void appl::Windows::onCallbackPreviousType() {
 	m_currentTypeId--;
 	propertySetOnWidgetNamed("current-type", "value", m_listType[m_currentTypeId]);
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->setCompare(m_listType[m_currentTypeId] + " " + m_listValue[m_currentId]);
 	}
 	onCallbackClear();
@@ -267,7 +267,7 @@ void appl::Windows::onCallbackNextType() {
 	}
 	propertySetOnWidgetNamed("current-type", "value", m_listType[m_currentTypeId]);
 	auto tmpDisp = ememory::dynamicPointerCast<appl::widget::TextAreaRecognition>(getSubObjectNamed("recorder"));
-	if (tmpDisp != nullptr) {
+	if (tmpDisp != null) {
 		tmpDisp->setCompare(m_listType[m_currentTypeId] + " " + m_listValue[m_currentId]);
 	}
 	onCallbackClear();

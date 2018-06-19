@@ -70,7 +70,7 @@ void dollar::EngineN::setNumberPointInGesture(size_t _value) {
 	m_numPointsInGesture = _value;
 	DOLLAR_ASSERT(m_numPointsInGesture>16, "NB element in a path must be > 16 ...");
 	for (auto &it: m_gestures) {
-		if (it == nullptr) {
+		if (it == null) {
 			continue;
 		}
 		it->configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation);
@@ -150,7 +150,7 @@ bool dollar::EngineN::loadGesture(const etk::String& _filename) {
 
 void dollar::EngineN::addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) {
 	ememory::SharedPtr<dollar::GestureN> gest = ememory::dynamicPointerCast<dollar::GestureN>(_gesture);
-	if (gest != nullptr) {
+	if (gest != null) {
 		gest->configure(m_numPointsInGesture/RATIO_START_VECTOR, m_numPointsInGesture, m_paramterIgnoreRotation);
 		m_gestures.pushBack(gest);
 	}

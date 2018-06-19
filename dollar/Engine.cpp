@@ -64,5 +64,5 @@ ememory::SharedPtr<dollar::Engine> dollar::createEngine(const etk::String& _meth
 	if (_method == "$P+") {
 		return ememory::makeShared<dollar::EnginePPlus>();
 	}
-	return nullptr;
+	return null;
 }
