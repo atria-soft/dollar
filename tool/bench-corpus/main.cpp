@@ -242,7 +242,7 @@ bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus) {
 				nbRecognise++;
 				nbRecognise2++;
 				TEST_INFO("         " << res.getName() << " score=" << res.getConfidence());
-			} else if (etk::toupper(res.getName()) == etk::toupper(label)) {
+			} else if (etk::toUpper(res.getName()) == etk::toUpper(label)) {
 				nbRecognise2++;
 				TEST_WARNING("         " << res.getName() << " score=" << res.getConfidence());
 			}else {

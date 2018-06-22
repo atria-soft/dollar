@@ -71,7 +71,7 @@ dollar::Gesture::Gesture():
 }
 
 bool dollar::Gesture::load(const etk::String& _fileName) {
-	etk::String tmpName = etk::tolower(_fileName);
+	etk::String tmpName = etk::toLower(_fileName);
 	if (etk::end_with(tmpName, ".json") == true) {
 		return loadJSON(_fileName);
 	} else if (etk::end_with(tmpName, ".svg") == true) {
@@ -117,7 +117,7 @@ bool dollar::Gesture::loadSVG(const etk::String& _fileName) {
 
 
 bool dollar::Gesture::store(const etk::String& _fileName) {
-	etk::String tmpName = etk::tolower(_fileName);
+	etk::String tmpName = etk::toLower(_fileName);
 	if (etk::end_with(tmpName, ".json") == true) {
 		storeJSON(_fileName);
 		return true;
