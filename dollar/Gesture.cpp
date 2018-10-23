@@ -7,7 +7,7 @@
 #include <dollar/debug.hpp>
 #include <dollar/Gesture.hpp>
 #include <dollar/tools.hpp>
-#include <etk/os/FSNode.hpp>
+#include <etk/uri/uri.hpp>
 #include <ejson/ejson.hpp>
 #include <esvg/esvg.hpp>
 #include <etk/stdTools.hpp>
@@ -35,7 +35,7 @@ static etk::Vector<etk::Vector<vec2>> loadPointsJson(const ejson::Document& _doc
 	return out;
 }
 
-etk::Vector<etk::Vector<vec2>> dollar::loadPoints(const etk::String& _fileName, etk::String* _label, etk::String* _type) {
+etk::Vector<etk::Vector<vec2>> dollar::loadPoints(const etk::Uri& _fileName, etk::String* _label, etk::String* _type) {
 	ejson::Document doc;
 	doc.load(_fileName);
 	if (_label != null) {
@@ -70,11 +70,11 @@ dollar::Gesture::Gesture():
 	
 }
 
-bool dollar::Gesture::load(const etk::String& _fileName) {
-	etk::String tmpName = etk::toLower(_fileName);
-	if (etk::end_with(tmpName, ".json") == true) {
+bool dollar::Gesture::load(const etk::Uri& _fileName) {
+	etk::String extention = etk::toLower(_fileName.getPath().getExtention());
+	if (extention == "json") {
 		return loadJSON(_fileName);
-	} else if (etk::end_with(tmpName, ".svg") == true) {
+	} else if (extention == "svg") {
 		return loadSVG(_fileName);
 	}
 	DOLLAR_ERROR("Un-sopported LOAD extention : " << _fileName);
@@ -82,7 +82,7 @@ bool dollar::Gesture::load(const etk::String& _fileName) {
 	return false;
 }
 
-bool dollar::Gesture::loadJSON(const etk::String& _fileName) {
+bool dollar::Gesture::loadJSON(const etk::Uri& _fileName) {
 	ejson::Document doc;
 	doc.load(_fileName);
 	if (doc["type"].toString().get() != "REFERENCE") {
@@ -96,12 +96,10 @@ bool dollar::Gesture::loadJSON(const etk::String& _fileName) {
 	return true;
 }
 
-bool dollar::Gesture::loadSVG(const etk::String& _fileName) {
+bool dollar::Gesture::loadSVG(const etk::Uri& _fileName) {
 	esvg::Document doc;
 	doc.load(_fileName);
-	etk::Vector<etk::String> plop = etk::split(_fileName, '.');
-	plop = etk::split(plop[plop.size() -2], '/');
-	plop = etk::split(plop[plop.size() -1], '_');
+	etk::Vector<etk::String> plop = etk::split(_fileName.getPath().getFileName(), '_');
 	m_name = plop[0];
 	m_subId = etk::string_to_int32_t(plop[1]);
 	m_path = doc.getLines();
@@ -116,12 +114,12 @@ bool dollar::Gesture::loadSVG(const etk::String& _fileName) {
 }
 
 
-bool dollar::Gesture::store(const etk::String& _fileName) {
-	etk::String tmpName = etk::toLower(_fileName);
-	if (etk::end_with(tmpName, ".json") == true) {
+bool dollar::Gesture::store(const etk::Uri& _fileName) {
+	etk::String extention = etk::toLower(_fileName.getPath().getExtention());
+	if (extention == "json") {
 		storeJSON(_fileName);
 		return true;
-	} else if (etk::end_with(tmpName, ".svg") == true) {
+	} else if (extention == "svg") {
 		storeSVG(_fileName);
 		return true;
 	}
@@ -130,7 +128,7 @@ bool dollar::Gesture::store(const etk::String& _fileName) {
 	return false;
 }
 
-void dollar::Gesture::storeJSON(const etk::String& _fileName) {
+void dollar::Gesture::storeJSON(const etk::Uri& _fileName) {
 	ejson::Document doc;
 	doc.add("type", ejson::String("REFERENCE"));
 	doc.add("value", ejson::String(m_name));
@@ -151,7 +149,7 @@ void dollar::Gesture::storeJSON(const etk::String& _fileName) {
 	doc.store(_fileName);
 }
 
-void dollar::Gesture::storeSVG(const etk::String& _fileName, bool _storeDot) {
+void dollar::Gesture::storeSVG(const etk::Uri& _fileName, bool _storeDot) {
 	etk::Vector<etk::Vector<vec2>> strokes = dollar::scaleToOne(m_path, true);
 	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
@@ -177,7 +175,14 @@ void dollar::Gesture::storeSVG(const etk::String& _fileName, bool _storeDot) {
 		*/
 	}
 	data += "</svg>\n";
-	etk::FSNodeWriteAllData(_fileName, data);
+	{
+		ememory::SharedPtr<etk::io::Interface> fileIO = etk::uri::get(_fileName);
+		if (fileIO->open(etk::io::OpenMode::Write) == false) {
+			return;
+		}
+		fileIO->writeAll(data);
+		fileIO->close();
+	}
 }
 
 void dollar::Gesture::set(const etk::String& _name, uint32_t _subId, etk::Vector<etk::Vector<vec2>> _path) {

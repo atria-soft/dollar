@@ -32,8 +32,8 @@ namespace dollar {
 		protected:
 			virtual dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _paths) = 0;
 		public:
-			virtual bool loadPath(const etk::String& _path);
-			virtual bool loadGesture(const etk::String& _filename) = 0;
+			virtual bool loadPath(const etk::Uri& _uri);
+			virtual bool loadGesture(const etk::Uri& _uri) = 0;
 			virtual void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) = 0;
 	};
 	

@@ -34,7 +34,7 @@ namespace dollar {
 		public:
 			EngineN(bool _protractor);
 			dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _points) override;
-			bool loadGesture(const etk::String& _filename) override;
+			bool loadGesture(const etk::Uri& _uri) override;
 			void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) override;
 		protected:
 			float distanceAtBestAngle(const etk::Vector<vec2>& _points, const etk::Vector<vec2>& _reference);

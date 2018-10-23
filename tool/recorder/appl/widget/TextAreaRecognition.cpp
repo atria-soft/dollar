@@ -10,7 +10,6 @@
 #include <etk/tool.hpp>
 #include <ejson/ejson.hpp>
 #include <esvg/esvg.hpp>
-#include <etk/os/FSNode.hpp>
 
 appl::widget::TextAreaRecognition::TextAreaRecognition() {
 	addObjectType("appl::widget::TextAreaRecognition");
@@ -20,9 +19,9 @@ void appl::widget::TextAreaRecognition::init() {
 	ewol::Widget::init();
 	m_updateDone = false;
 	
-	//m_dollarEngine.loadPath("DATA:text");
+	//m_dollarEngine.loadPath("DATA:///text");
 	m_dollarEngine = dollar::createEngine("$P+");
-	m_dollarEngine->loadPath("DATA:reference");
+	m_dollarEngine->loadPath("DATA:///reference");
 	// TODO: m_dollarEngine->setScaleKeepRatio(true);
 	markToRedraw();
 	// connect a periodic update ...
@@ -81,14 +80,13 @@ void appl::widget::TextAreaRecognition::store(const etk::String& _userName, cons
 		list.add(obj);
 	}
 	etk::String streamOut = doc.generateMachineString();
-	etk::String fileName;
-	fileName = "HOME:DOLLAR/corpus/";
+	etk::Path fileName = "~/DOLLAR/corpus";
 	if (_value == "/") {
-		fileName += "slash";
+		fileName /= "slash";
 	} else if (_value == "\\") {
-		fileName += "back-slash";
+		fileName /= "back-slash";
 	} else {
-		fileName += _value;
+		fileName /= _value;
 	}
 	fileName += "_";
 	fileName += _type;
@@ -97,7 +95,14 @@ void appl::widget::TextAreaRecognition::store(const etk::String& _userName, cons
 	fileName += "_";
 	fileName += etk::toString(m_time.get());
 	fileName += ".json";
-	etk::FSNodeWriteAllData(fileName, streamOut);
+	{
+		ememory::SharedPtr<etk::io::Interface> fileIO = etk::uri::get(fileName);
+		if (fileIO->open(etk::io::OpenMode::Write) == false) {
+			return;
+		}
+		fileIO->writeAll(streamOut);
+		fileIO->close();
+	}
 	APPL_WARNING("store: " << fileName);
 }
 
@@ -137,7 +142,7 @@ etk::Vector<etk::Vector<vec2>> scalePoints(etk::Vector<etk::Vector<vec2>> _list,
 	return _list;
 }
 
-etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<etk::Vector<vec2>>& _list, int32_t _objectSize, const etk::String& _filename) {
+etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<etk::Vector<vec2>>& _list, int32_t _objectSize, const etk::Uri& _filename) {
 	// generate SVG to render:
 	esvg::Document docSvg;
 	etk::String data("<?xml version='1.0' encoding='UTF-8' standalone='no'?>\n");
@@ -163,7 +168,13 @@ etk::Vector<etk::Color<float,4>> renderWithSVG(const etk::Vector<etk::Vector<vec
 	data += "</svg>\n";
 	docSvg.parse(data);
 	//docSvg.store(list[index]->getName()+ ".svg");
-	etk::FSNodeWriteAllData(_filename, data);
+	{
+		ememory::SharedPtr<etk::io::Interface> fileIO = etk::uri::get(_filename);
+		if (fileIO->open(etk::io::OpenMode::Write) == true) {
+			fileIO->writeAll(data);
+			fileIO->close();
+		}
+	}
 	
 	// generate SVG output ...
 	ivec2 renderSize = ivec2(_objectSize,_objectSize);

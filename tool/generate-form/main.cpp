@@ -8,7 +8,6 @@
 #include <dollar/tools.hpp>
 #include <etk/etk.hpp>
 #include <test-debug/debug.hpp>
-#include <etk/os/FSNode.hpp>
 
 #include <iostream>
 #include <etk/Map.hpp>
@@ -44,13 +43,13 @@ void usage(const etk::String& _progName) {
 	TEST_PRINT("        example:");
 }
 
-bool testCorpus(const etk::String& _srcCorpus);
+bool testCorpus(const etk::Uri& _srcCorpus);
 
 
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
-	etk::String srcCorpus;
+	etk::Path srcCorpus;
 	
 	for (int32_t iii=1; iii<_argc; ++iii) {
 		etk::String arg = _argv[iii];
@@ -119,7 +118,7 @@ int main(int _argc, const char *_argv[]) {
 	return testCorpus(srcCorpus);
 }
 
-void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& _list, const etk::String& _refName) {
+void generateFile(const etk::Uri& _fileName, const etk::Vector<etk::Uri>& _list, const etk::Uri& _refName) {
 	TEST_PRINT("    " << _fileName);
 	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
@@ -164,24 +163,38 @@ void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& 
 		}
 	}
 	data += "</svg>\n";
-	etk::FSNodeWriteAllData(_fileName, data);
+	{
+		ememory::SharedPtr<etk::io::Interface> fileIO = etk::uri::get(_fileName);
+		if (fileIO->open(etk::io::OpenMode::Write) == false) {
+			return;
+		}
+		fileIO->writeAll(data);
+		fileIO->close();
+	}
 }
 
 #define OUT_OF_RANGE (999999.0f)
 
-bool testCorpus(const etk::String& _srcCorpus) {
+bool testCorpus(const etk::Uri& _srcCorpus) {
 	TEST_PRINT("---------------------------------------------------------------------------");
 	TEST_PRINT("-- Create list of files: " << _srcCorpus);
 	TEST_PRINT("---------------------------------------------------------------------------");
-	etk::FSNode path(_srcCorpus);
-	etk::Vector<etk::String> files = path.folderGetSub(false, true, "*.json");
+	etk::Vector<etk::Uri> filesTmp = etk::uri::list(_srcCorpus);
+	etk::Vector<etk::Uri> files;
+	for (auto &it: filesTmp) {
+		if (etk::uri::isFile(it) == false) {
+			continue;
+		}
+		if (it.getPath().getExtention().toLower() == "json") {
+			files.pushBack(it);
+		}
+	}
 
 	TEST_PRINT("corpus have " << files.size() << " files");
 	etk::Vector<etk::String> listOfElementInCorpus;
 	for (auto &it : files) {
-		if (etk::end_with(it, ".json") == true) {
-			etk::Vector<etk::String> path = etk::split(it, '/');
-			etk::String elemName = etk::split(path[path.size()-1],'_')[0];
+		if (it.getPath().getExtention().toLower() == "json") {
+			etk::String elemName = etk::split(it.getPath().getFileName(),'_')[0];
 			if (elemName == "slash") {
 				elemName = "/";
 			}if (elemName == "back-slash") {
@@ -196,7 +209,7 @@ bool testCorpus(const etk::String& _srcCorpus) {
 		}
 	}
 	// remove generation path ...
-	etk::FSNodeRemove("out_dollar/generate-form");
+	etk::uri::remove(etk::Path("out_dollar/generate-form"));
 //listOfElementInCorpus.clear();
 //listOfElementInCorpus.pushBack("slash");
 
@@ -207,7 +220,7 @@ bool testCorpus(const etk::String& _srcCorpus) {
 		TEST_PRINT("---------------------------------------------------------------------------");
 		TEST_PRINT("-- Generate FOR: '" << itTypeOfCorpus << "'");
 		TEST_PRINT("---------------------------------------------------------------------------");
-		etk::Vector<etk::String> fileFiltered;
+		etk::Vector<etk::Uri> fileFiltered;
 		etk::String fileNameIt = itTypeOfCorpus;
 		if (fileNameIt == "/") {
 			fileNameIt = "slash";
@@ -215,9 +228,8 @@ bool testCorpus(const etk::String& _srcCorpus) {
 			fileNameIt = "back-slash";
 		}
 		for (auto &it : files) {
-			if (etk::end_with(it, ".json") == true) {
-				etk::Vector<etk::String> path = etk::split(it, '/');
-				etk::String filename = path[path.size()-1];
+			if (it.getPath().getExtention().toLower() == "json") {
+				etk::String filename = it.getPath().getFileName();
 				if (etk::start_with(filename, fileNameIt + "_") == true) {
 					fileFiltered.pushBack(it);
 				}
@@ -239,11 +251,11 @@ bool testCorpus(const etk::String& _srcCorpus) {
 			itTypeOfCorpusFileName = "question";
 		}
 		{
-			etk::Vector<etk::String> listPath;
+			etk::Vector<etk::Uri> listPath;
 			for (size_t iii=0; iii<fileFiltered.size(); ++iii) {
 				listPath.pushBack(fileFiltered[iii]);
 			}
-			generateFile("out_dollar/generate-form/pre_generate/" + itTypeOfCorpusFileName + "_FULL.svg", listPath, "");
+			generateFile(etk::Path("out_dollar") / "generate-form" / "pre_generate" / itTypeOfCorpusFileName + "_FULL.svg", listPath, "");
 		}
 		for (size_t iii=0; iii<fileFiltered.size(); ++iii) {
 			ememory::SharedPtr<dollar::GesturePPlus> gest = ememory::makeShared<dollar::GesturePPlus>();
@@ -257,8 +269,7 @@ bool testCorpus(const etk::String& _srcCorpus) {
 			reco.setPenalityNotLinkSample(penalitySample);
 			reco.setPenalityAspectRatio(penalityAspectRatio);
 			reco.addGesture(gest);
-			etk::Vector<etk::String> path = etk::split(fileFiltered[iii], '/');
-			etk::String filename = path[path.size()-1];
+			etk::String filename = fileFiltered[iii].getPath().getFileName();
 			TEST_DEBUG("Test :    " << fileFiltered[iii]);
 			for (size_t jjj=0; jjj<fileFiltered.size(); ++jjj) {
 				if (iii >= jjj) {
@@ -269,8 +280,7 @@ bool testCorpus(const etk::String& _srcCorpus) {
 				dollar::Results res = reco.recognize(listPoints);
 				results[iii][jjj] = res.getConfidence();
 				results[jjj][iii] = res.getConfidence();
-				path = etk::split(fileFiltered[jjj], '/');
-				etk::String filename2 = path[path.size()-1];
+				etk::String filename2 = fileFiltered[jjj].getPath().getFileName();
 				TEST_DEBUG("         " << res.getConfidence() << "        " << filename2);
 			}
 		}
@@ -362,8 +372,7 @@ bool testCorpus(const etk::String& _srcCorpus) {
 				TEST_INFO("        nbElement : " << linkIds.size() << " / " << residualValues << " / " << fileFiltered.size());
 				TEST_INFO("        values : " << linkIds);
 				for (size_t jjj=0; jjj<ordered.size(); ++jjj) {
-					etk::Vector<etk::String> path = etk::split(fileFiltered[ordered[jjj].second], '/');
-					etk::String filename = path[path.size()-1];
+					etk::String filename =  fileFiltered[ordered[jjj].second].getPath().getFileName();;
 					etk::String tmppp = " ";
 					if (jjj<linkIds.size()) {
 						tmppp = "*";
@@ -394,7 +403,7 @@ bool testCorpus(const etk::String& _srcCorpus) {
 			residualValues -= (linkIds.size() +1);
 			TEST_DEBUG("Generate output files (SVG with all added path in one file)");
 			// Generate Files:
-			etk::Vector<etk::String> listPath;
+			etk::Vector<etk::Uri> listPath;
 			for (size_t iii=0; iii<linkIds.size(); ++iii) {
 				listPath.pushBack(fileFiltered[linkIds[iii]]);
 			}

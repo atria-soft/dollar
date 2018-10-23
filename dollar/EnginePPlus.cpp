@@ -8,7 +8,6 @@
 #include <dollar/debug.hpp>
 #include <dollar/Rectangle.hpp>
 #include <dollar/tools.hpp>
-#include <etk/os/FSNode.hpp>
 
 #include <cmath>
 #include <algorithm>
@@ -233,10 +232,10 @@ float dollar::EnginePPlus::calculatePPlusDistance(const etk::Vector<vec2>& _poin
 
 
 
-bool dollar::EnginePPlus::loadGesture(const etk::String& _filename) {
+bool dollar::EnginePPlus::loadGesture(const etk::Uri& _uri) {
 	ememory::SharedPtr<dollar::Gesture> ref = ememory::makeShared<dollar::GesturePPlus>();
-	DOLLAR_DEBUG("Load Gesture: " << _filename);
-	if (ref->load(_filename) == true) {
+	DOLLAR_DEBUG("Load Gesture: " << _uri);
+	if (ref->load(_uri) == true) {
 		addGesture(ref);
 		return true;
 	}
@@ -251,7 +250,7 @@ void dollar::EnginePPlus::addGesture(ememory::SharedPtr<dollar::Gesture> _gestur
 	}
 }
 
-static void storeSVG(const etk::String& _fileName,
+static void storeSVG(const etk::Uri& _fileName,
                      const ememory::SharedPtr<dollar::GesturePPlus>& _gesture,
                      const etk::Vector<etk::Vector<vec2>>& _strokes,
                      const etk::Vector<vec2>& _points,
@@ -305,7 +304,14 @@ static void storeSVG(const etk::String& _fileName,
 		data += "	          />\n";
 	}
 	data += "</svg>\n";
-	etk::FSNodeWriteAllData(_fileName, data);
+	{
+		ememory::SharedPtr<etk::io::Interface> fileIO = etk::uri::get(_fileName);
+		if (fileIO->open(etk::io::OpenMode::Write) == false) {
+			return;
+		}
+		fileIO->writeAll(data);
+		fileIO->close();
+	}
 }
 
 

@@ -8,6 +8,7 @@
 #include <etk/math/Vector2D.hpp>
 #include <ememory/memory.hpp>
 
+#include <etk/uri/uri.hpp>
 #include <etk/String.hpp>
 
 namespace dollar {
@@ -26,14 +27,14 @@ namespace dollar {
 			float getKeepAspectRatio() {
 				return m_aspectRatio;
 			}
-			bool load(const etk::String& _filename);
-			bool store(const etk::String& _filename);
+			bool load(const etk::Uri& _filename);
+			bool store(const etk::Uri& _filename);
 			void set(const etk::String& _name, uint32_t _subId, etk::Vector<etk::Vector<vec2>> _path);
 		protected:
-			bool loadJSON(const etk::String& _filename);
-			bool loadSVG(const etk::String& _filename);
-			void storeJSON(const etk::String& _filename);
-			void storeSVG(const etk::String& _filename, bool _storeDot=false);
+			bool loadJSON(const etk::Uri& _filename);
+			bool loadSVG(const etk::Uri& _filename);
+			void storeJSON(const etk::Uri& _filename);
+			void storeSVG(const etk::Uri& _filename, bool _storeDot=false);
 		public:
 			const etk::String& getName() {
 				return m_name;
@@ -46,5 +47,5 @@ namespace dollar {
 	 * @brief Load all point from a specific file
 	 *
 	 */
-	etk::Vector<etk::Vector<vec2>> loadPoints(const etk::String& _fileName, etk::String* _label=null, etk::String* _type=null);
+	etk::Vector<etk::Vector<vec2>> loadPoints(const etk::Uri& _fileName, etk::String* _label=null, etk::String* _type=null);
 }

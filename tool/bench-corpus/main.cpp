@@ -10,7 +10,6 @@
 
 #include <etk/etk.hpp>
 #include <test-debug/debug.hpp>
-#include <etk/os/FSNode.hpp>
 #include <etk/Map.hpp>
 
 static bool keepAspectRatio = false;
@@ -36,14 +35,14 @@ void usage(const etk::String& _progName) {
 	TEST_PRINT("            corpus_path         Path of the corpus files");
 }
 
-bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus);
+bool testCorpus(const etk::Uri& _srcGesture, const etk::Uri& _srcCorpus);
 
 
 int main(int _argc, const char *_argv[]) {
 	// init etk log system and file interface:
 	etk::init(_argc, _argv);
-	etk::String srcGesture;
-	etk::String srcCorpus;
+	etk::Path srcGesture;
+	etk::Path srcCorpus;
 	for (int32_t iii=1; iii<_argc; ++iii) {
 		etk::String arg = _argv[iii];
 		if (    arg == "-h"
@@ -110,7 +109,7 @@ int main(int _argc, const char *_argv[]) {
 	return testCorpus(srcGesture, srcCorpus);
 }
 
-void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& _list) {
+void generateFile(const etk::Uri& _fileName, const etk::Vector<etk::Uri>& _list) {
 	etk::String data("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
 	data += "<svg height=\"100\" width=\"100\">\n";
 	for (auto &itFile : _list) {
@@ -131,10 +130,17 @@ void generateFile(const etk::String& _fileName, const etk::Vector<etk::String>& 
 		}
 	}
 	data += "</svg>\n";
-	etk::FSNodeWriteAllData(_fileName, data);
+	{
+		ememory::SharedPtr<etk::io::Interface> fileIO = etk::uri::get(_fileName);
+		if (fileIO->open(etk::io::OpenMode::Write) == false) {
+			return;
+		}
+		fileIO->writeAll(data);
+		fileIO->close();
+	}
 }
 
-void annalyseResult(etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results, etk::String>>>& _result) {
+void annalyseResult(etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results, etk::Uri>>>& _result) {
 	TEST_PRINT("Full results:");
 	for (auto &it : _result) {
 		int32_t nbRecognise = 0;
@@ -144,8 +150,8 @@ void annalyseResult(etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results,
 		if (etk::split(it.first, ' ').size() > 1) {
 			type = etk::split(it.first, ' ')[1];
 		}
-		etk::Vector<etk::String> listFull;
-		etk::Vector<etk::String> listWrong;
+		etk::Vector<etk::Uri> listFull;
+		etk::Vector<etk::Uri> listWrong;
 		etk::Map<etk::String, int32_t> wrongValues;
 		for (auto itRes : it.second) {
 			nbtested ++;
@@ -174,16 +180,16 @@ void annalyseResult(etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results,
 				TEST_WARNING("            " << it.first << " " << it.second << "");
 			}
 		}
-		generateFile("out_dollar/bench-corpus/OK/" + label + "_" + type + ".svg", listFull);
+		generateFile(etk::Path("out_dollar") / "bench-corpus" / "OK" / label + "_" + type + ".svg", listFull);
 		if (listWrong.size() != 0) {
-			generateFile("out_dollar/bench-corpus/ERROR/" + label + "_" + type + "_ERROR.svg", listWrong);
+			generateFile(etk::Path("out_dollar") / "bench-corpus" / "ERROR" / label + "_" + type + "_ERROR.svg", listWrong);
 		} else {
-			etk::FSNodeRemove("out_dollar/bench-corpus/ERROR/" + label + "_" + type + "_ERROR.svg");
+			etk::uri::remove(etk::Path("out_dollar") / "bench-corpus" / "ERROR" / label + "_" + type + "_ERROR.svg");
 		}
 	}
 }
 
-bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus) {
+bool testCorpus(const etk::Uri& _srcGesture, const etk::Uri& _srcCorpus) {
 	// declare a Gesture (internal API)
 	dollar::EnginePPlus reco;
 	reco.setScaleKeepRatio(keepAspectRatio);
@@ -201,14 +207,22 @@ bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus) {
 		return -1;
 	}
 	TEST_DEBUG("List all file in the corpus path");
-	etk::FSNode path(_srcCorpus);
-	etk::Vector<etk::String> files = path.folderGetSub(false, true, "*.json");
+	etk::Vector<etk::Uri> filesTmp = etk::uri::list(_srcCorpus);
+	etk::Vector<etk::Uri> files;
+	for (auto &it: filesTmp) {
+		if (etk::uri::isFile(it) == false) {
+			continue;
+		}
+		if (it.getPath().getExtention().toLower() == "json") {
+			files.pushBack(it);
+		}
+	}
 	TEST_PRINT("---------------------------------------------------------------------------");
 	TEST_PRINT("-- test gestures: ");
 	TEST_PRINT("---------------------------------------------------------------------------");
 	
 	// "label_type" ==> list of (result, file test name)
-	etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results, etk::String>>> agregateResults;
+	etk::Map<etk::String, etk::Vector<etk::Pair<dollar::Results, etk::Uri>>> agregateResults;
 	int32_t nbRecognise = 0;
 	int32_t nbRecognise2 = 0;
 	int32_t nbtested = 0;
@@ -220,8 +234,7 @@ bool testCorpus(const etk::String& _srcGesture, const etk::String& _srcCorpus) {
 			//continue; // rejest for now ...
 		}
 		nbtested++;
-		etk::Vector<etk::String> path = etk::split(it, '/');
-		etk::String filename = path[path.size()-1];
+		etk::String filename = it.getPath().getFileName();
 		TEST_PRINT("Test '" << label << "' type=" << type << "       " << filename);
 		dollar::Results res = reco.recognize(listPoints);
 		

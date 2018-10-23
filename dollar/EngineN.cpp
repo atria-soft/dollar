@@ -8,7 +8,6 @@
 #include <dollar/debug.hpp>
 #include <dollar/Rectangle.hpp>
 #include <dollar/tools.hpp>
-#include <etk/os/FSNode.hpp>
 
 #include <cmath>
 #include <algorithm>
@@ -138,10 +137,10 @@ void dollar::EngineN::setRotationInvariance(bool _ignoreRotation) {
 	}
 }
 
-bool dollar::EngineN::loadGesture(const etk::String& _filename) {
+bool dollar::EngineN::loadGesture(const etk::Uri& _uri) {
 	ememory::SharedPtr<dollar::Gesture> ref = ememory::makeShared<dollar::GestureN>();
-	DOLLAR_DEBUG("Load Gesture: " << _filename);
-	if (ref->load(_filename) == true) {
+	DOLLAR_DEBUG("Load Gesture: " << _uri);
+	if (ref->load(_uri) == true) {
 		addGesture(ref);
 		return true;
 	}

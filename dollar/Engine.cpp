@@ -8,10 +8,10 @@
 #include <dollar/debug.hpp>
 #include <dollar/Rectangle.hpp>
 #include <dollar/tools.hpp>
-#include <etk/os/FSNode.hpp>
 #include <dollar/EngineN.hpp>
 #include <dollar/EngineP.hpp>
 #include <dollar/EnginePPlus.hpp>
+#include <etk/path/fileSystem.hpp>
 
 
 dollar::Engine::Engine():
@@ -28,12 +28,14 @@ size_t dollar::Engine::getNumberResult() {
 }
 
 
-bool dollar::Engine::loadPath(const etk::String& _path) {
-	DOLLAR_INFO("Load Path: " << _path);
-	etk::FSNode path(_path);
-	etk::Vector<etk::String> files = path.folderGetSub(false, true, "*.json");
+bool dollar::Engine::loadPath(const etk::Uri& _uri) {
+	DOLLAR_INFO("Load Path: " << _uri);
+	etk::Vector<etk::Uri> files = etk::uri::list(_uri);
 	for (auto &it : files) {
-		if (etk::end_with(it, ".json") == true) {
+		if (etk::uri::isFile(it) == false) {
+			continue;
+		}
+		if (it.getPath().getExtention().toLower() == "json") {
 			loadGesture(it);
 		}
 	}

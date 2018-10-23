@@ -8,7 +8,6 @@
 #include <dollar/debug.hpp>
 #include <dollar/Rectangle.hpp>
 #include <dollar/tools.hpp>
-#include <etk/os/FSNode.hpp>
 #include <cmath>
 #include <algorithm>
 #define MAX_FLOAT std::numeric_limits<float>::max()
@@ -101,10 +100,10 @@ static float calculateBestDistance(const etk::Vector<vec2>& _points, const etk::
 }
 
 
-bool dollar::EngineP::loadGesture(const etk::String& _filename) {
+bool dollar::EngineP::loadGesture(const etk::Uri& _uri) {
 	ememory::SharedPtr<dollar::Gesture> ref = ememory::makeShared<dollar::GestureP>();
-	DOLLAR_DEBUG("Load Gesture: " << _filename);
-	if (ref->load(_filename) == true) {
+	DOLLAR_DEBUG("Load Gesture: " << _uri);
+	if (ref->load(_uri) == true) {
 		addGesture(ref);
 		return true;
 	}

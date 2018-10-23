@@ -7,7 +7,6 @@
 #include <dollar/debug.hpp>
 #include <dollar/GesturePPlus.hpp>
 #include <dollar/tools.hpp>
-#include <etk/os/FSNode.hpp>
 #include <ejson/ejson.hpp>
 #include <esvg/esvg.hpp>
 #include <etk/stdTools.hpp>

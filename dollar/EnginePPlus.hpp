@@ -52,7 +52,7 @@ namespace dollar {
 		public:
 			EnginePPlus();
 			dollar::Results recognize2(const etk::Vector<etk::Vector<vec2>>& _paths) override;
-			bool loadGesture(const etk::String& _filename) override;
+			bool loadGesture(const etk::Uri& _uri) override;
 			void addGesture(ememory::SharedPtr<dollar::Gesture> _gesture) override;
 		protected:
 			float calculatePPlusDistance(const etk::Vector<vec2>& _points,

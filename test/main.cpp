@@ -20,7 +20,7 @@ int main(int _argc, const char *_argv[]) {
 TEST(TestAll, plop) {
 	/*
 	dollar::Gesture gest;
-	gest.set("test", 55, dollar::loadPoints("DATA:test/P.json"));
+	gest.set("test", 55, dollar::loadPoints("DATA:///test/P.json"));
 	gest.configure(0.1, 64, false, 0.1f);
 	*/
 }
@@ -30,8 +30,8 @@ TEST(TestAll, plop) {
  */
 TEST(TestAll, singleStroke_normal) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N");
-	reco->loadPath("DATA:figure");
-	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/arrow.json"));
+	reco->loadPath("DATA:///figure");
+	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:///test/arrow.json"));
 	EXPECT_EQ(res.haveMatch(), true);
 	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -46,8 +46,8 @@ TEST(TestAll, singleStroke_normal) {
 
 TEST(TestAll, singleStroke_protractor) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N");
-	reco->loadPath("DATA:figure");
-	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/arrow.json"));
+	reco->loadPath("DATA:///figure");
+	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:///test/arrow.json"));
 	EXPECT_EQ(res.haveMatch(), true);
 	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -66,8 +66,8 @@ TEST(TestAll, singleStroke_protractor) {
  */
 TEST(TestAll, multiStroke_normal) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N");
-	reco->loadPath("DATA:text");
-	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
+	reco->loadPath("DATA:///text");
+	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:///test/P.json"));
 	EXPECT_EQ(res.haveMatch(), true);
 	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -82,8 +82,8 @@ TEST(TestAll, multiStroke_normal) {
 
 TEST(TestAll, multiStroke_protractor) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$N-protractor");
-	reco->loadPath("DATA:text");
-	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
+	reco->loadPath("DATA:///text");
+	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:///test/P.json"));
 	EXPECT_EQ(res.haveMatch(), true);
 	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -100,8 +100,8 @@ TEST(TestAll, multiStroke_protractor) {
  */
 TEST(TestAll, multiStroke_point) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$P");
-	reco->loadPath("DATA:text");
-	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
+	reco->loadPath("DATA:///text");
+	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:///test/P.json"));
 	EXPECT_EQ(res.haveMatch(), true);
 	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
@@ -118,8 +118,8 @@ TEST(TestAll, multiStroke_point) {
  */
 TEST(TestAll, multiStroke_pointPlus) {
 	ememory::SharedPtr<dollar::Engine> reco = dollar::createEngine("$P+");
-	reco->loadPath("DATA:text");
-	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:test/P.json"));
+	reco->loadPath("DATA:///text");
+	dollar::Results res = reco->recognize(dollar::loadPoints("DATA:///test/P.json"));
 	EXPECT_EQ(res.haveMatch(), true);
 	if (res.haveMatch() == false) {
 		TEST_INFO("   Recognise noting ...");
